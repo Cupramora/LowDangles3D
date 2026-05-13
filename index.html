@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Dane’s Cybervoid 3D Library</title>
+    <title>Dane's Cybervoid 3D Library</title>
 
     <!-- 3D Viewer -->
     <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
@@ -208,6 +208,25 @@
             border: none;
             box-shadow: 0 0 10px var(--neon-magenta) inset;
             outline: none;
+        }
+
+        /* ===== DROP ZONE ===== */
+
+        #dropzone {
+            margin: 40px auto;
+            width: 80%;
+            padding: 40px;
+            border: 2px dashed #0ff;
+            border-radius: 12px;
+            text-align: center;
+            color: #0ff;
+            background: rgba(0, 255, 255, 0.05);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+        }
+
+        #dropzone.dragover {
+            background: rgba(0, 255, 255, 0.15);
+            box-shadow: 0 0 30px #0ff;
         }
 
         /* ===== GALLERY / HOLOGRAPHIC CARDS ===== */
@@ -463,15 +482,16 @@
     <div class="minimap-title">NAV MAP</div>
     <div class="minimap-dots">
         <div class="minimap-dot" onclick="scrollToSection('top')"></div>
+        <div class="minimap-dot" onclick="scrollToSection('dropzone-section')"></div>
         <div class="minimap-dot" onclick="scrollToSection('gallery-section')"></div>
         <div class="minimap-dot" onclick="scrollToSection('viewer-section')"></div>
     </div>
 </div>
 
 <header id="top">
-    <h1>Dane’s Cybervoid 3D Library</h1>
+    <h1>Dane's Cybervoid 3D Library</h1>
     <p class="subtitle">
-        A single‑page portal into my 3D models—distorted cityscapes, neon voids, and holographic objects.
+        A single���page portal into my 3D models—distorted cityscapes, neon voids, and holographic objects.
     </p>
 
     <div class="search-row">
@@ -486,6 +506,12 @@
         </select>
     </div>
 </header>
+
+<section id="dropzone-section">
+    <div id="dropzone">
+        <p>Drop PNG + GLB + STL files here</p>
+    </div>
+</section>
 
 <section class="gallery-section" id="gallery-section">
     <div class="gallery" id="gallery">
@@ -570,11 +596,79 @@ function filterItems() {
         item.style.display = (matchesSearch && matchesCategory) ? '' : 'none';
     });
 }
+
+/* ===== DROP ZONE FUNCTIONALITY ===== */
+const gallery = document.getElementById("gallery");
+const dropzone = document.getElementById("dropzone");
+
+dropzone.addEventListener("dragover", e => {
+    e.preventDefault();
+    dropzone.classList.add("dragover");
+});
+
+dropzone.addEventListener("dragleave", () => {
+    dropzone.classList.remove("dragover");
+});
+
+dropzone.addEventListener("drop", e => {
+    e.preventDefault();
+    dropzone.classList.remove("dragover");
+
+    const files = [...e.dataTransfer.files];
+    processFiles(files);
+});
+
+function processFiles(files) {
+    const groups = {};
+
+    files.forEach(file => {
+        const name = file.name.toLowerCase();
+
+        // Extract base keyword (before first dot)
+        const base = name.split(".")[0]
+            .replace(/[-_](highpoly|lowpoly|print|stl|glb|png).*/, "")
+            .replace(/[-_]\d+$/, "");
+
+        if (!groups[base]) groups[base] = [];
+        groups[base].push(file);
+    });
+
+    Object.keys(groups).forEach(base => {
+        addItemToGallery(base, groups[base]);
+    });
+}
+
+function addItemToGallery(base, files) {
+    let png = files.find(f => f.name.endsWith(".png"));
+    let glb = files.find(f => f.name.endsWith(".glb"));
+    let stl = files.find(f => f.name.endsWith(".stl"));
+
+    // Fallback name
+    let title = base || ("untitled" + String(Date.now()).slice(-4));
+
+    // Create gallery card
+    const item = document.createElement("div");
+    item.className = "item";
+    item.setAttribute("data-name", title);
+    item.setAttribute("data-category", "props");
+
+    item.innerHTML = `
+        <div class="item-glitch"></div>
+        <div class="item-inner">
+            <div class="item-title">${title}</div>
+            <img src="${png ? URL.createObjectURL(png) : 'placeholder.png'}">
+
+            ${glb ? `<a href="#" onclick="openViewer('${URL.createObjectURL(glb)}', '${title}')">View in 3D</a>` : ""}
+
+            ${stl ? `<a class="btn" href="${URL.createObjectURL(stl)}" download>Download STL</a>` : ""}
+
+            <a class="btn discount" href="#">Discount</a>
+        </div>
+    `;
+
+    gallery.appendChild(item);
+}
 </script>
 
 </body>
 </html>
-
-</body>
-</html>
-
