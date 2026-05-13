@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Dane's Cybervoid 3D Library</title>
+    <title>LowDangles3D</title>
 
     <!-- 3D Viewer -->
     <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
@@ -175,6 +175,96 @@
         .minimap-dot:hover {
             transform: scale(1.2);
             box-shadow: 0 0 14px var(--neon-yellow);
+        }
+
+        /* ===== SUGGESTIONS SECTION ===== */
+
+        .suggestions-section {
+            padding: 20px;
+            background: rgba(5, 5, 20, 0.5);
+            border-bottom: 1px solid rgba(0, 246, 255, 0.2);
+        }
+
+        .suggestions-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .suggestions-title {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--neon-yellow);
+            margin-bottom: 10px;
+            text-shadow: 0 0 8px var(--neon-yellow);
+        }
+
+        .suggestion-input-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        #suggestion-text {
+            flex: 1;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid var(--neon-cyan);
+            background: rgba(0, 20, 30, 0.9);
+            color: var(--neon-cyan);
+            font-size: 0.95rem;
+            box-shadow: 0 0 10px rgba(0, 246, 255, 0.2) inset;
+            outline: none;
+        }
+
+        #suggestion-text:focus {
+            box-shadow: 0 0 15px rgba(0, 246, 255, 0.4) inset;
+        }
+
+        #submit-suggestion {
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: none;
+            background: var(--neon-magenta);
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 15px var(--neon-magenta);
+            transition: all 0.2s;
+        }
+
+        #submit-suggestion:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px var(--neon-magenta);
+        }
+
+        .suggestions-archive {
+            max-height: 250px;
+            overflow-y: auto;
+            border: 1px solid rgba(0, 246, 255, 0.2);
+            border-radius: 6px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .suggestion-item {
+            padding: 8px;
+            margin-bottom: 8px;
+            border-left: 2px solid var(--neon-cyan);
+            background: rgba(0, 246, 255, 0.05);
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .suggestion-text {
+            color: var(--neon-cyan);
+            margin-bottom: 3px;
+        }
+
+        .suggestion-meta {
+            font-size: 0.75rem;
+            color: var(--neon-yellow);
+            opacity: 0.8;
         }
 
         /* ===== SEARCH + CATEGORY ===== */
@@ -455,6 +545,9 @@
             #search {
                 width: 100%;
             }
+            .suggestion-input-group {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
@@ -482,6 +575,7 @@
     <div class="minimap-title">NAV MAP</div>
     <div class="minimap-dots">
         <div class="minimap-dot" onclick="scrollToSection('top')"></div>
+        <div class="minimap-dot" onclick="scrollToSection('suggestions-section')"></div>
         <div class="minimap-dot" onclick="scrollToSection('dropzone-section')"></div>
         <div class="minimap-dot" onclick="scrollToSection('gallery-section')"></div>
         <div class="minimap-dot" onclick="scrollToSection('viewer-section')"></div>
@@ -489,10 +583,8 @@
 </div>
 
 <header id="top">
-    <h1>Dane's Cybervoid 3D Library</h1>
-    <p class="subtitle">
-        A single‑page portal into my 3D models—distorted cityscapes, neon voids, and holographic objects.
-    </p>
+    <h1>LowDangles3D</h1>
+    <p class="subtitle">Where models can hang out.</p>
 
     <div class="search-row">
         <input id="search" type="text" placeholder="Search models...">
@@ -506,6 +598,20 @@
         </select>
     </div>
 </header>
+
+<!-- SUGGESTIONS SECTION -->
+<section id="suggestions-section" class="suggestions-section">
+    <div class="suggestions-container">
+        <div class="suggestions-title">💬 Community Suggestions</div>
+        <div class="suggestion-input-group">
+            <input type="text" id="suggestion-text" placeholder="Drop a suggestion...">
+            <button id="submit-suggestion">Submit</button>
+        </div>
+        <div class="suggestions-archive" id="suggestions-archive">
+            <p style="text-align: center; color: var(--neon-yellow); font-size: 0.9rem;">No suggestions yet. Be the first!</p>
+        </div>
+    </div>
+</section>
 
 <section id="dropzone-section">
     <div id="dropzone">
@@ -596,6 +702,60 @@ function filterItems() {
         item.style.display = (matchesSearch && matchesCategory) ? '' : 'none';
     });
 }
+
+/* ===== SUGGESTIONS FUNCTIONALITY ===== */
+const suggestionText = document.getElementById('suggestion-text');
+const submitBtn = document.getElementById('submit-suggestion');
+const suggestionsArchive = document.getElementById('suggestions-archive');
+
+// Load suggestions from localStorage
+let suggestions = JSON.parse(localStorage.getItem('lowdangles_suggestions')) || [];
+
+// Display suggestions
+function displaySuggestions() {
+    if (suggestions.length === 0) {
+        suggestionsArchive.innerHTML = '<p style="text-align: center; color: var(--neon-yellow); font-size: 0.9rem;">No suggestions yet. Be the first!</p>';
+        return;
+    }
+
+    suggestionsArchive.innerHTML = suggestions.map(s => `
+        <div class="suggestion-item">
+            <div class="suggestion-text">${escapeHtml(s.text)}</div>
+            <div class="suggestion-meta">${s.date} @ ${s.time}</div>
+        </div>
+    `).join('');
+}
+
+// Escape HTML to prevent XSS
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Submit suggestion
+submitBtn.addEventListener('click', addSuggestion);
+suggestionText.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') addSuggestion();
+});
+
+function addSuggestion() {
+    const text = suggestionText.value.trim();
+    if (!text) return;
+
+    const now = new Date();
+    const date = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+    suggestions.unshift({ text, date, time });
+    localStorage.setItem('lowdangles_suggestions', JSON.stringify(suggestions));
+
+    suggestionText.value = '';
+    displaySuggestions();
+}
+
+// Initial load
+displaySuggestions();
 
 /* ===== DROP ZONE FUNCTIONALITY ===== */
 const gallery = document.getElementById("gallery");
