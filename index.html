@@ -491,7 +491,7 @@
 <header id="top">
     <h1>Dane's Cybervoid 3D Library</h1>
     <p class="subtitle">
-        A single���page portal into my 3D models—distorted cityscapes, neon voids, and holographic objects.
+        A single‑page portal into my 3D models—distorted cityscapes, neon voids, and holographic objects.
     </p>
 
     <div class="search-row">
@@ -509,7 +509,7 @@
 
 <section id="dropzone-section">
     <div id="dropzone">
-        <p>Drop PNG + GLB + STL files here</p>
+        <p>Drop PNG + GLB + OBJ + FBX + STL files here</p>
     </div>
 </section>
 
@@ -626,7 +626,7 @@ function processFiles(files) {
 
         // Extract base keyword (before first dot)
         const base = name.split(".")[0]
-            .replace(/[-_](highpoly|lowpoly|print|stl|glb|png).*/, "")
+            .replace(/[-_](highpoly|lowpoly|print|stl|glb|obj|fbx|png).*/, "")
             .replace(/[-_]\d+$/, "");
 
         if (!groups[base]) groups[base] = [];
@@ -641,6 +641,8 @@ function processFiles(files) {
 function addItemToGallery(base, files) {
     let png = files.find(f => f.name.endsWith(".png"));
     let glb = files.find(f => f.name.endsWith(".glb"));
+    let obj = files.find(f => f.name.endsWith(".obj"));
+    let fbx = files.find(f => f.name.endsWith(".fbx"));
     let stl = files.find(f => f.name.endsWith(".stl"));
 
     // Fallback name
@@ -658,7 +660,11 @@ function addItemToGallery(base, files) {
             <div class="item-title">${title}</div>
             <img src="${png ? URL.createObjectURL(png) : 'placeholder.png'}">
 
-            ${glb ? `<a href="#" onclick="openViewer('${URL.createObjectURL(glb)}', '${title}')">View in 3D</a>` : ""}
+            ${glb ? `<a href="#" onclick="openViewer('${URL.createObjectURL(glb)}', '${title}')">View in 3D (GLB)</a>` : ""}
+
+            ${obj ? `<a class="btn" href="${URL.createObjectURL(obj)}" download>Download OBJ</a>` : ""}
+
+            ${fbx ? `<a class="btn" href="${URL.createObjectURL(fbx)}" download>Download FBX</a>` : ""}
 
             ${stl ? `<a class="btn" href="${URL.createObjectURL(stl)}" download>Download STL</a>` : ""}
 
