@@ -1,0 +1,4 @@
+how to use
+create asset folder and drop pngs, glbs, stl files into asset folder
+duplicate .item block for each model and change data-name,data-category,img src, model path way in openviewer..
+payments and discount links
