@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Dane’s 3D Object Library</title>
+    <title>Dane’s Cyberpunk 3D Library</title>
 
     <!-- 3D Viewer -->
     <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
@@ -10,15 +10,58 @@
     <style>
         body {
             margin: 0;
-            background: #0d0d0d;
+            background: #050505;
             color: #e6e6e6;
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
         }
+
+        /* Neon Glow */
+        .neon {
+            text-shadow: 0 0 10px #0ff, 0 0 20px #0ff;
+        }
+
         header {
             text-align: center;
             padding: 40px 20px;
         }
-        h1 { margin-bottom: 10px; }
+
+        h1 {
+            margin-bottom: 10px;
+            font-size: 3rem;
+            color: #0ff;
+            text-shadow: 0 0 20px #0ff;
+        }
+
+        /* Search + Category Row */
+        .search-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        #search {
+            width: 50%;
+            max-width: 400px;
+            padding: 12px;
+            border-radius: 6px;
+            border: none;
+            font-size: 1rem;
+            background: #111;
+            color: #0ff;
+            box-shadow: 0 0 10px #0ff inset;
+        }
+
+        /* Category Dropdown */
+        #category {
+            padding: 12px;
+            border-radius: 6px;
+            background: #111;
+            color: #f0f;
+            border: none;
+            box-shadow: 0 0 10px #f0f inset;
+        }
 
         /* Gallery Grid */
         .gallery {
@@ -27,16 +70,27 @@
             gap: 30px;
             padding: 40px;
         }
+
         .item {
-            background: #1a1a1a;
+            background: #0a0a0a;
             padding: 20px;
-            border-radius: 10px;
+            border-radius: 12px;
             text-align: center;
+            box-shadow: 0 0 20px #0ff55a33, 0 0 40px #f0f33a22;
+            transition: transform 0.2s;
         }
+
+        .item:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 30px #0ff, 0 0 60px #f0f;
+        }
+
         .item img {
             width: 100%;
             border-radius: 6px;
+            box-shadow: 0 0 15px #0ff88;
         }
+
         .item a {
             color: #6cf;
             text-decoration: none;
@@ -49,15 +103,19 @@
             display: none;
             padding: 40px;
             background: #000;
+            box-shadow: 0 0 40px #0ff inset;
         }
+
         #viewer.active {
             display: block;
         }
+
         model-viewer {
             width: 100%;
             height: 500px;
-            background: #111;
+            background: radial-gradient(circle, #111 0%, #000 100%);
             border-radius: 10px;
+            box-shadow: 0 0 40px #0ff;
         }
 
         /* Buttons */
@@ -65,14 +123,17 @@
             display: inline-block;
             padding: 10px 18px;
             margin: 10px 5px;
-            background: #6cf;
+            background: #0ff;
             color: #000;
             border-radius: 6px;
             text-decoration: none;
             font-weight: bold;
+            box-shadow: 0 0 15px #0ff;
         }
+
         .btn.discount {
-            background: #4f9;
+            background: #f0f;
+            box-shadow: 0 0 15px #f0f;
         }
     </style>
 </head>
@@ -80,49 +141,80 @@
 <body>
 
 <header>
-    <h1>Dane’s 3D Object Library</h1>
-    <p>Click any item to view it in 3D or download it.</p>
+    <h1 class="neon">Dane’s Cyberpunk 3D Library</h1>
+    <p>Search, filter, and explore my 3D models in neon‑soaked glory.</p>
+
+    <!-- SEARCH + CATEGORY -->
+    <div class="search-row">
+        <input id="search" type="text" placeholder="Search models...">
+
+        <select id="category">
+            <option value="all">▼ All Categories</option>
+            <option value="trees">Trees</option>
+            <option value="ships">Ships</option>
+            <option value="props">Props</option>
+            <option value="creatures">Creatures</option>
+        </select>
+    </div>
 </header>
 
 <!-- GALLERY -->
-<div class="gallery">
+<div class="gallery" id="gallery">
 
-    <!-- TEMPLATE ITEM (duplicate this block for each model) -->
-    <div class="item">
+    <!-- TEMPLATE ITEM -->
+    <div class="item" data-name="Palm Tree" data-category="trees">
         <img src="assets/palm_clip.png" alt="Palm Clip Art">
 
-        <!-- Open Viewer -->
         <a href="#" onclick="openViewer('assets/palm_tree.glb')">View in 3D</a>
 
-        <!-- PayPal/Gumroad Download -->
-        <a class="btn" href="https://your-payment-link-here" target="_blank">Download</a>
+        <a class="btn" href="https://your-payment-link" target="_blank">Download</a>
 
-        <!-- Discount Button -->
-        <a class="btn discount" href="https://your-discount-link-here" target="_blank">Discount</a>
+        <a class="btn discount" href="https://your-discount-link" target="_blank">Discount</a>
     </div>
 
 </div>
 
 <!-- POCKET DIMENSION VIEWER -->
 <div id="viewer">
-    <h2>3D Viewer</h2>
+    <h2 class="neon">3D Viewer</h2>
     <model-viewer id="mv" auto-rotate camera-controls></model-viewer>
 
     <br>
 
-    <!-- Close Viewer -->
     <a class="btn" href="#" onclick="closeViewer()">Close Viewer</a>
 </div>
 
 <script>
+/* Open 3D Viewer */
 function openViewer(modelPath) {
     document.getElementById('mv').setAttribute('src', modelPath);
     document.getElementById('viewer').classList.add('active');
     window.scrollTo(0, document.body.scrollHeight);
 }
 
+/* Close 3D Viewer */
 function closeViewer() {
     document.getElementById('viewer').classList.remove('active');
+}
+
+/* SEARCH FILTER */
+document.getElementById('search').addEventListener('input', filterItems);
+document.getElementById('category').addEventListener('change', filterItems);
+
+function filterItems() {
+    let search = document.getElementById('search').value.toLowerCase();
+    let category = document.getElementById('category').value;
+    let items = document.querySelectorAll('.item');
+
+    items.forEach(item => {
+        let name = item.getAttribute('data-name').toLowerCase();
+        let cat = item.getAttribute('data-category');
+
+        let matchesSearch = name.includes(search);
+        let matchesCategory = (category === 'all' || category === cat);
+
+        item.style.display = (matchesSearch && matchesCategory) ? '' : 'none';
+    });
 }
 </script>
 
