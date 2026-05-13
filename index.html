@@ -2,37 +2,183 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Dane’s Cyberpunk 3D Library</title>
+    <title>Dane’s Cybervoid 3D Library</title>
 
     <!-- 3D Viewer -->
     <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
 
     <style>
-        body {
-            margin: 0;
-            background: #050505;
-            color: #e6e6e6;
-            font-family: 'Segoe UI', sans-serif;
+        :root {
+            --neon-cyan: #00f6ff;
+            --neon-magenta: #ff00ff;
+            --neon-yellow: #ffe066;
+            --bg-deep: #050308;
         }
 
-        /* Neon Glow */
-        .neon {
-            text-shadow: 0 0 10px #0ff, 0 0 20px #0ff;
+        * {
+            box-sizing: border-box;
         }
+
+        body {
+            margin: 0;
+            background: var(--bg-deep);
+            color: #e6e6e6;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* ===== BACKGROUND: PICASSO CYBER CITY + VOID DISTORTIONS ===== */
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(circle at 10% 20%, #2b0b45 0, transparent 40%),
+                radial-gradient(circle at 80% 10%, #0b3b5f 0, transparent 45%),
+                radial-gradient(circle at 20% 80%, #5f0b3b 0, transparent 45%),
+                linear-gradient(135deg, #050308 0, #050308 40%, #0a0b1a 100%);
+            mix-blend-mode: screen;
+            opacity: 0.8;
+            z-index: -3;
+        }
+
+        /* Abstract city blocks */
+        .city-layer {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: -2;
+            opacity: 0.35;
+        }
+
+        .city-block {
+            position: absolute;
+            background: linear-gradient(
+                to top,
+                rgba(0, 0, 0, 0.9),
+                rgba(0, 246, 255, 0.2)
+            );
+            border-radius: 4px;
+            box-shadow:
+                0 0 10px rgba(0, 246, 255, 0.4),
+                0 0 25px rgba(255, 0, 255, 0.3);
+            transform-origin: bottom;
+            animation: city-float 12s ease-in-out infinite alternate;
+        }
+
+        @keyframes city-float {
+            0% { transform: translateY(0) skewX(-6deg); }
+            100% { transform: translateY(-10px) skewX(-3deg); }
+        }
+
+        /* Scanline + glitch overlay */
+        .scanlines {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background-image: linear-gradient(
+                to bottom,
+                rgba(255, 255, 255, 0.04) 1px,
+                transparent 1px
+            );
+            background-size: 100% 2px;
+            mix-blend-mode: soft-light;
+            opacity: 0.25;
+            z-index: -1;
+            animation: scan-flicker 3s linear infinite;
+        }
+
+        @keyframes scan-flicker {
+            0%, 100% { opacity: 0.25; }
+            50% { opacity: 0.35; }
+        }
+
+        .glitch-noise {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background-image: repeating-linear-gradient(
+                45deg,
+                rgba(255, 255, 255, 0.03) 0,
+                rgba(255, 255, 255, 0.03) 2px,
+                transparent 2px,
+                transparent 4px
+            );
+            mix-blend-mode: overlay;
+            opacity: 0.18;
+            z-index: -1;
+        }
+
+        /* ===== HEADER / TITLE ===== */
 
         header {
             text-align: center;
-            padding: 40px 20px;
+            padding: 40px 20px 20px;
         }
 
         h1 {
             margin-bottom: 10px;
             font-size: 3rem;
-            color: #0ff;
-            text-shadow: 0 0 20px #0ff;
+            color: var(--neon-cyan);
+            text-shadow:
+                0 0 10px var(--neon-cyan),
+                0 0 25px var(--neon-magenta);
         }
 
-        /* Search + Category Row */
+        .subtitle {
+            max-width: 600px;
+            margin: 0 auto;
+            opacity: 0.85;
+        }
+
+        /* ===== NEON MINIMAP NAV BAR ===== */
+
+        .minimap-nav {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(5, 5, 20, 0.85);
+            border-radius: 12px;
+            padding: 10px 14px;
+            box-shadow:
+                0 0 15px rgba(0, 246, 255, 0.5),
+                0 0 30px rgba(255, 0, 255, 0.3);
+            backdrop-filter: blur(10px);
+            z-index: 10;
+        }
+
+        .minimap-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--neon-yellow);
+            margin-bottom: 6px;
+        }
+
+        .minimap-dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .minimap-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            border: 1px solid var(--neon-cyan);
+            background: radial-gradient(circle, var(--neon-magenta) 0, transparent 60%);
+            cursor: pointer;
+            box-shadow: 0 0 8px var(--neon-cyan);
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+
+        .minimap-dot:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 14px var(--neon-yellow);
+        }
+
+        /* ===== SEARCH + CATEGORY ===== */
+
         .search-row {
             display: flex;
             justify-content: center;
@@ -48,47 +194,96 @@
             border-radius: 6px;
             border: none;
             font-size: 1rem;
-            background: #111;
-            color: #0ff;
-            box-shadow: 0 0 10px #0ff inset;
+            background: rgba(10, 10, 25, 0.9);
+            color: var(--neon-cyan);
+            box-shadow: 0 0 10px var(--neon-cyan) inset;
+            outline: none;
         }
 
-        /* Category Dropdown */
         #category {
             padding: 12px;
             border-radius: 6px;
-            background: #111;
-            color: #f0f;
+            background: rgba(10, 10, 25, 0.9);
+            color: var(--neon-magenta);
             border: none;
-            box-shadow: 0 0 10px #f0f inset;
+            box-shadow: 0 0 10px var(--neon-magenta) inset;
+            outline: none;
         }
 
-        /* Gallery Grid */
+        /* ===== GALLERY / HOLOGRAPHIC CARDS ===== */
+
+        .gallery-section {
+            padding: 20px 20px 40px;
+        }
+
         .gallery {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 30px;
-            padding: 40px;
+            padding: 20px 0 40px;
         }
 
         .item {
-            background: #0a0a0a;
+            position: relative;
+            background: radial-gradient(circle at top left,
+                rgba(0, 246, 255, 0.25),
+                rgba(5, 5, 20, 0.95)
+            );
             padding: 20px;
-            border-radius: 12px;
+            border-radius: 16px;
             text-align: center;
-            box-shadow: 0 0 20px #0ff55a33, 0 0 40px #f0f33a22;
-            transition: transform 0.2s;
+            box-shadow:
+                0 0 20px rgba(0, 246, 255, 0.4),
+                0 0 40px rgba(255, 0, 255, 0.3);
+            backdrop-filter: blur(12px);
+            overflow: hidden;
+            transform: translateY(0);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .item::before {
+            content: "";
+            position: absolute;
+            inset: -40%;
+            background: conic-gradient(
+                from 120deg,
+                rgba(0, 246, 255, 0.15),
+                rgba(255, 0, 255, 0.15),
+                rgba(255, 224, 102, 0.15),
+                rgba(0, 246, 255, 0.15)
+            );
+            mix-blend-mode: screen;
+            opacity: 0.25;
+            animation: holo-spin 18s linear infinite;
+        }
+
+        @keyframes holo-spin {
+            to { transform: rotate(360deg); }
         }
 
         .item:hover {
-            transform: scale(1.03);
-            box-shadow: 0 0 30px #0ff, 0 0 60px #f0f;
+            transform: translateY(-4px);
+            box-shadow:
+                0 0 30px rgba(0, 246, 255, 0.7),
+                0 0 60px rgba(255, 0, 255, 0.5);
+        }
+
+        .item-inner {
+            position: relative;
+            z-index: 1;
+        }
+
+        .item-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--neon-yellow);
+            text-shadow: 0 0 8px var(--neon-yellow);
         }
 
         .item img {
             width: 100%;
-            border-radius: 6px;
-            box-shadow: 0 0 15px #0ff88;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 246, 255, 0.8);
         }
 
         .item a {
@@ -98,53 +293,187 @@
             margin-top: 10px;
         }
 
-        /* Pocket Dimension Viewer */
+        /* Glitch flicker on cards */
+        .item-glitch {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background: repeating-linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 0.08) 0,
+                rgba(255, 255, 255, 0.08) 1px,
+                transparent 1px,
+                transparent 3px
+            );
+            mix-blend-mode: soft-light;
+            opacity: 0;
+            animation: card-glitch 4s infinite;
+        }
+
+        @keyframes card-glitch {
+            0%, 90%, 100% { opacity: 0; transform: translate(0, 0); }
+            92% { opacity: 0.4; transform: translate(-2px, 1px); }
+            94% { opacity: 0.2; transform: translate(2px, -1px); }
+            96% { opacity: 0.3; transform: translate(-1px, 2px); }
+        }
+
+        /* ===== POCKET DIMENSION VIEWER ===== */
+
+        .viewer-section {
+            padding: 40px 20px 60px;
+        }
+
         #viewer {
             display: none;
-            padding: 40px;
-            background: #000;
-            box-shadow: 0 0 40px #0ff inset;
+            padding: 30px;
+            background: radial-gradient(circle at top,
+                rgba(0, 246, 255, 0.15),
+                #020208 60%
+            );
+            border-radius: 20px;
+            box-shadow:
+                0 0 40px rgba(0, 246, 255, 0.6),
+                0 0 80px rgba(255, 0, 255, 0.4);
+            position: relative;
+            overflow: hidden;
         }
 
         #viewer.active {
             display: block;
         }
 
+        /* Electric arc border */
+        #viewer::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 20px;
+            border: 2px solid transparent;
+            background:
+                linear-gradient(120deg, var(--neon-cyan), var(--neon-magenta), var(--neon-yellow))
+                border-box;
+            -webkit-mask:
+                linear-gradient(#000 0 0) padding-box,
+                linear-gradient(#000 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0.9;
+            animation: arc-flicker 2.5s infinite;
+        }
+
+        @keyframes arc-flicker {
+            0%, 100% { opacity: 0.9; filter: blur(1px); }
+            40% { opacity: 0.5; filter: blur(2px); }
+            60% { opacity: 1; filter: blur(0.5px); }
+        }
+
+        .viewer-title {
+            margin-bottom: 10px;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan);
+        }
+
         model-viewer {
             width: 100%;
             height: 500px;
-            background: radial-gradient(circle, #111 0%, #000 100%);
-            border-radius: 10px;
-            box-shadow: 0 0 40px #0ff;
+            background:
+                radial-gradient(circle at center, #111 0, #000 60%),
+                repeating-linear-gradient(
+                    to right,
+                    rgba(0, 246, 255, 0.15) 0,
+                    rgba(0, 246, 255, 0.15) 1px,
+                    transparent 1px,
+                    transparent 6px
+                );
+            border-radius: 12px;
+            box-shadow:
+                0 0 30px rgba(0, 246, 255, 0.8),
+                0 0 60px rgba(255, 0, 255, 0.5);
         }
 
-        /* Buttons */
+        /* ===== BUTTONS ===== */
+
         .btn {
             display: inline-block;
             padding: 10px 18px;
             margin: 10px 5px;
-            background: #0ff;
+            background: var(--neon-cyan);
             color: #000;
             border-radius: 6px;
             text-decoration: none;
             font-weight: bold;
-            box-shadow: 0 0 15px #0ff;
+            box-shadow: 0 0 15px var(--neon-cyan);
         }
 
         .btn.discount {
-            background: #f0f;
-            box-shadow: 0 0 15px #f0f;
+            background: var(--neon-magenta);
+            box-shadow: 0 0 15px var(--neon-magenta);
+        }
+
+        .btn.secondary {
+            background: #111;
+            color: var(--neon-cyan);
+            box-shadow: 0 0 10px rgba(0, 246, 255, 0.6);
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        /* ===== SECTIONS FOR MINIMAP ===== */
+
+        section {
+            scroll-margin-top: 80px;
+        }
+
+        /* ===== RESPONSIVE ===== */
+
+        @media (max-width: 700px) {
+            .search-row {
+                flex-direction: column;
+                padding: 0 20px;
+            }
+            #search {
+                width: 100%;
+            }
         }
     </style>
 </head>
 
 <body>
 
-<header>
-    <h1 class="neon">Dane’s Cyberpunk 3D Library</h1>
-    <p>Search, filter, and explore my 3D models in neon‑soaked glory.</p>
+<!-- ABSTRACT CITY LAYER -->
+<div class="city-layer" aria-hidden="true">
+    <!-- You can duplicate / tweak these blocks for more chaos -->
+    <div class="city-block" style="left:5%; bottom:0; width:40px; height:160px;"></div>
+    <div class="city-block" style="left:12%; bottom:0; width:30px; height:120px; animation-delay:1s;"></div>
+    <div class="city-block" style="left:22%; bottom:0; width:50px; height:200px; animation-delay:0.5s;"></div>
+    <div class="city-block" style="left:35%; bottom:0; width:35px; height:140px; animation-delay:1.5s;"></div>
+    <div class="city-block" style="left:50%; bottom:0; width:60px; height:220px; animation-delay:0.8s;"></div>
+    <div class="city-block" style="left:65%; bottom:0; width:45px; height:180px; animation-delay:1.2s;"></div>
+    <div class="city-block" style="left:78%; bottom:0; width:30px; height:130px; animation-delay:0.3s;"></div>
+    <div class="city-block" style="left:88%; bottom:0; width:55px; height:210px; animation-delay:1.8s;"></div>
+</div>
 
-    <!-- SEARCH + CATEGORY -->
+<div class="scanlines"></div>
+<div class="glitch-noise"></div>
+
+<!-- NEON MINIMAP NAV -->
+<div class="minimap-nav">
+    <div class="minimap-title">NAV MAP</div>
+    <div class="minimap-dots">
+        <div class="minimap-dot" onclick="scrollToSection('top')"></div>
+        <div class="minimap-dot" onclick="scrollToSection('gallery-section')"></div>
+        <div class="minimap-dot" onclick="scrollToSection('viewer-section')"></div>
+    </div>
+</div>
+
+<header id="top">
+    <h1>Dane’s Cybervoid 3D Library</h1>
+    <p class="subtitle">
+        A single‑page portal into my 3D models—distorted cityscapes, neon voids, and holographic objects.
+    </p>
+
     <div class="search-row">
         <input id="search" type="text" placeholder="Search models...">
 
@@ -158,38 +487,63 @@
     </div>
 </header>
 
-<!-- GALLERY -->
-<div class="gallery" id="gallery">
+<section class="gallery-section" id="gallery-section">
+    <div class="gallery" id="gallery">
 
-    <!-- TEMPLATE ITEM -->
-    <div class="item" data-name="Palm Tree" data-category="trees">
-        <img src="assets/palm_clip.png" alt="Palm Clip Art">
+        <!-- TEMPLATE ITEM – DUPLICATE THIS BLOCK PER MODEL -->
+        <div class="item" data-name="Palm Tree" data-category="trees">
+            <div class="item-glitch"></div>
+            <div class="item-inner">
+                <div class="item-title">Palm Tree</div>
+                <img src="assets/palm_clip.png" alt="Palm Clip Art">
 
-        <a href="#" onclick="openViewer('assets/palm_tree.glb')">View in 3D</a>
+                <a href="#" onclick="openViewer('assets/palm_tree.glb', 'Palm Tree')">View in 3D</a>
 
-        <a class="btn" href="https://your-payment-link" target="_blank">Download</a>
+                <a class="btn" href="https://your-payment-link" target="_blank">Download</a>
 
-        <a class="btn discount" href="https://your-discount-link" target="_blank">Discount</a>
+                <a class="btn discount" href="https://your-discount-link" target="_blank">Discount</a>
+            </div>
+        </div>
+
+        <!-- Add more items here, changing:
+             data-name, data-category, img src, model path, payment links -->
+
     </div>
+</section>
 
-</div>
+<section class="viewer-section" id="viewer-section">
+    <div id="viewer">
+        <h2 class="viewer-title" id="viewer-title">3D Viewer</h2>
+        <model-viewer id="mv" auto-rotate camera-controls></model-viewer>
 
-<!-- POCKET DIMENSION VIEWER -->
-<div id="viewer">
-    <h2 class="neon">3D Viewer</h2>
-    <model-viewer id="mv" auto-rotate camera-controls></model-viewer>
+        <br>
 
-    <br>
-
-    <a class="btn" href="#" onclick="closeViewer()">Close Viewer</a>
-</div>
+        <a class="btn secondary" href="#" onclick="closeViewer()">Close Viewer</a>
+    </div>
+</section>
 
 <script>
+function scrollToSection(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    window.scrollTo({
+        top: el.offsetTop - 20,
+        behavior: 'smooth'
+    });
+}
+
 /* Open 3D Viewer */
-function openViewer(modelPath) {
-    document.getElementById('mv').setAttribute('src', modelPath);
-    document.getElementById('viewer').classList.add('active');
-    window.scrollTo(0, document.body.scrollHeight);
+function openViewer(modelPath, title) {
+    const mv = document.getElementById('mv');
+    mv.setAttribute('src', modelPath);
+
+    const vt = document.getElementById('viewer-title');
+    vt.textContent = title ? title + " – 3D View" : "3D Viewer";
+
+    const viewer = document.getElementById('viewer');
+    viewer.classList.add('active');
+
+    scrollToSection('viewer-section');
 }
 
 /* Close 3D Viewer */
@@ -197,7 +551,7 @@ function closeViewer() {
     document.getElementById('viewer').classList.remove('active');
 }
 
-/* SEARCH FILTER */
+/* SEARCH + CATEGORY FILTER */
 document.getElementById('search').addEventListener('input', filterItems);
 document.getElementById('category').addEventListener('change', filterItems);
 
@@ -217,6 +571,9 @@ function filterItems() {
     });
 }
 </script>
+
+</body>
+</html>
 
 </body>
 </html>
