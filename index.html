@@ -456,6 +456,28 @@
             padding: 3px;
         }
 
+        .item-delete {
+            margin-top: 4px;
+            padding-top: 4px;
+            border-top: 1px solid rgba(0, 246, 255, 0.2);
+        }
+
+        .item-delete button {
+            width: 100%;
+            padding: 2px;
+            background: rgba(255, 0, 0, 0.6);
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            font-size: 0.65rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .item-delete button:hover {
+            background: rgba(255, 0, 0, 0.9);
+        }
+
         /* Glitch flicker on cards */
         .item-glitch {
             position: absolute;
@@ -692,20 +714,6 @@
 <section class="gallery-section" id="gallery-section">
     <div class="gallery" id="gallery">
 
-        <!-- TEMPLATE ITEM – DUPLICATE THIS BLOCK PER MODEL -->
-        <div class="item" data-name="Palm Tree" data-category="trees">
-            <div class="item-glitch"></div>
-            <div class="item-inner">
-                <div class="item-title">Palm Tree</div>
-                <img src="assets/palm_clip.png" alt="Palm Clip Art">
-
-                <div class="item-buttons">
-                    <a class="btn" href="#" onclick="openViewer('assets/palm_tree.glb', 'Palm Tree')">View 3D</a>
-                    <a class="btn discount" href="https://your-payment-link" target="_blank">Get</a>
-                </div>
-            </div>
-        </div>
-
     </div>
 </section>
 
@@ -831,11 +839,77 @@ function addSuggestion() {
     displaySuggestions();
 }
 
-// Initial load
+// Initial load suggestions
 displaySuggestions();
 
-/* ===== DROP ZONE FUNCTIONALITY ===== */
+/* ===== GALLERY ITEMS PERSISTENCE ===== */
 const gallery = document.getElementById("gallery");
+
+// Load items from localStorage
+let galleryItems = JSON.parse(localStorage.getItem('lowdangles_items')) || [];
+
+// Display saved items
+function displayGalleryItems() {
+    gallery.innerHTML = '';
+    galleryItems.forEach((itemData, index) => {
+        createItemElement(itemData, index);
+    });
+}
+
+// Create item element from saved data
+function createItemElement(itemData, index) {
+    const item = document.createElement("div");
+    item.className = "item";
+    item.setAttribute("data-name", itemData.title);
+    item.setAttribute("data-category", "props");
+    item.setAttribute("data-index", index);
+
+    let buttonsHtml = '';
+
+    if (itemData.glb) {
+        buttonsHtml += `<a class="btn" href="#" onclick="openViewer('${itemData.glb}', '${itemData.title}')">View 3D</a>`;
+    }
+
+    if (itemData.stl) {
+        buttonsHtml += `<a class="btn" href="${itemData.stl}" download>STL</a>`;
+    }
+
+    if (itemData.obj) {
+        buttonsHtml += `<a class="btn" href="${itemData.obj}" download>OBJ</a>`;
+    }
+
+    if (itemData.fbx) {
+        buttonsHtml += `<a class="btn" href="${itemData.fbx}" download>FBX</a>`;
+    }
+
+    item.innerHTML = `
+        <div class="item-glitch"></div>
+        <div class="item-inner">
+            <div class="item-title">${itemData.title}</div>
+            <img src="${itemData.png || 'placeholder.png'}" alt="${itemData.title}">
+            <div class="item-buttons">
+                ${buttonsHtml || '<span style="color: var(--neon-yellow); font-size: 0.7rem;">No files</span>'}
+            </div>
+            <div class="item-delete">
+                <button onclick="deleteGalleryItem(${index})">Delete</button>
+            </div>
+        </div>
+    `;
+
+    gallery.appendChild(item);
+}
+
+// Delete item from gallery
+function deleteGalleryItem(index) {
+    galleryItems.splice(index, 1);
+    localStorage.setItem('lowdangles_items', JSON.stringify(galleryItems));
+    displayGalleryItems();
+}
+
+// Initial load of gallery items
+displayGalleryItems();
+
+/* ===== DROP ZONE FUNCTIONALITY ===== */
 const dropzone = document.getElementById("dropzone");
 
 dropzone.addEventListener("dragover", e => {
@@ -884,46 +958,39 @@ function addItemToGallery(baseName, fileData) {
 
     const title = baseName || ("untitled" + String(Date.now()).slice(-4));
 
-    // Create gallery card
-    const item = document.createElement("div");
-    item.className = "item";
-    item.setAttribute("data-name", title);
-    item.setAttribute("data-category", "props");
+    // Convert files to base64 data URLs for localStorage
+    const filePromises = [];
 
-    let buttonsHtml = '';
+    if (pngFile) filePromises.push(fileToBase64(pngFile).then(data => ({ key: 'png', data })));
+    if (glbFile) filePromises.push(fileToBase64(glbFile).then(data => ({ key: 'glb', data })));
+    if (objFile) filePromises.push(fileToBase64(objFile).then(data => ({ key: 'obj', data })));
+    if (fbxFile) filePromises.push(fileToBase64(fbxFile).then(data => ({ key: 'fbx', data })));
+    if (stlFile) filePromises.push(fileToBase64(stlFile).then(data => ({ key: 'stl', data })));
 
-    if (glbFile) {
-        const glbUrl = URL.createObjectURL(glbFile);
-        buttonsHtml += `<a class="btn" href="#" onclick="openViewer('${glbUrl}', '${title}')">View 3D</a>`;
-    }
+    Promise.all(filePromises).then(results => {
+        const itemData = { title };
 
-    if (stlFile) {
-        const stlUrl = URL.createObjectURL(stlFile);
-        buttonsHtml += `<a class="btn" href="${stlUrl}" download>STL</a>`;
-    }
+        results.forEach(({ key, data }) => {
+            itemData[key] = data;
+        });
 
-    if (objFile) {
-        const objUrl = URL.createObjectURL(objFile);
-        buttonsHtml += `<a class="btn" href="${objUrl}" download>OBJ</a>`;
-    }
+        // Add to gallery items array
+        galleryItems.push(itemData);
+        localStorage.setItem('lowdangles_items', JSON.stringify(galleryItems));
 
-    if (fbxFile) {
-        const fbxUrl = URL.createObjectURL(fbxFile);
-        buttonsHtml += `<a class="btn" href="${fbxUrl}" download>FBX</a>`;
-    }
+        // Refresh display
+        displayGalleryItems();
+    });
+}
 
-    item.innerHTML = `
-        <div class="item-glitch"></div>
-        <div class="item-inner">
-            <div class="item-title">${title}</div>
-            <img src="${pngFile ? URL.createObjectURL(pngFile) : 'placeholder.png'}" alt="${title}">
-            <div class="item-buttons">
-                ${buttonsHtml || '<span style="color: var(--neon-yellow); font-size: 0.7rem;">No files</span>'}
-            </div>
-        </div>
-    `;
-
-    gallery.appendChild(item);
+// Convert file to base64 data URL
+function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
 }
 </script>
 
