@@ -110,6 +110,137 @@
             z-index: -1;
         }
 
+        /* ===== MODAL STYLES ===== */
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: radial-gradient(circle at top,
+                rgba(0, 246, 255, 0.15),
+                #020208 60%
+            );
+            border: 2px solid var(--neon-cyan);
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 0 40px rgba(0, 246, 255, 0.6);
+        }
+
+        .modal-title {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan);
+            margin-bottom: 20px;
+        }
+
+        .modal-group {
+            margin-bottom: 15px;
+        }
+
+        .modal-label {
+            color: var(--neon-yellow);
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid var(--neon-cyan);
+            background: rgba(0, 20, 30, 0.9);
+            color: var(--neon-cyan);
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        .modal-input:focus {
+            box-shadow: 0 0 15px rgba(0, 246, 255, 0.4) inset;
+        }
+
+        .file-selector {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .file-selector select {
+            flex: 1;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid var(--neon-cyan);
+            background: rgba(0, 20, 30, 0.9);
+            color: var(--neon-cyan);
+            outline: none;
+        }
+
+        .file-selector button {
+            padding: 8px 12px;
+            background: var(--neon-magenta);
+            color: #000;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 10px var(--neon-magenta);
+        }
+
+        .file-selector button:hover {
+            transform: translateY(-1px);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 10px;
+            transition: all 0.2s;
+        }
+
+        .modal-btn.save {
+            background: var(--neon-cyan);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-cyan);
+        }
+
+        .modal-btn.save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px var(--neon-cyan);
+        }
+
+        .modal-btn.close {
+            background: #111;
+            color: var(--neon-cyan);
+            box-shadow: 0 0 10px rgba(0, 246, 255, 0.6);
+        }
+
+        .modal-btn.close:hover {
+            transform: translateY(-2px);
+        }
+
         /* ===== SUBTLE SUGGESTIONS BOX (TOP LEFT) ===== */
 
         .suggestions-floating {
@@ -456,17 +587,17 @@
             padding: 3px;
         }
 
-        .item-delete {
+        .item-actions {
             margin-top: 4px;
             padding-top: 4px;
             border-top: 1px solid rgba(0, 246, 255, 0.2);
+            display: flex;
+            gap: 3px;
         }
 
-        .item-delete button {
-            width: 100%;
+        .item-actions button {
+            flex: 1;
             padding: 2px;
-            background: rgba(255, 0, 0, 0.6);
-            color: #fff;
             border: none;
             border-radius: 3px;
             font-size: 0.65rem;
@@ -474,7 +605,23 @@
             transition: all 0.2s;
         }
 
-        .item-delete button:hover {
+        .edit-btn {
+            background: rgba(0, 246, 255, 0.6);
+            color: #000;
+            font-weight: bold;
+        }
+
+        .edit-btn:hover {
+            background: rgba(0, 246, 255, 0.9);
+        }
+
+        .delete-btn {
+            background: rgba(255, 0, 0, 0.6);
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .delete-btn:hover {
             background: rgba(255, 0, 0, 0.9);
         }
 
@@ -660,6 +807,73 @@
 <div class="scanlines"></div>
 <div class="glitch-noise"></div>
 
+<!-- EDIT MODAL -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <h2 class="modal-title">Edit Item</h2>
+        
+        <div class="modal-group">
+            <label class="modal-label">Item Title</label>
+            <input type="text" id="editTitle" class="modal-input" placeholder="Enter title...">
+        </div>
+
+        <div class="modal-group">
+            <label class="modal-label">PNG Thumbnail</label>
+            <div class="file-selector">
+                <select id="pngSelector">
+                    <option value="">-- Select PNG --</option>
+                </select>
+                <button onclick="addFileToItem('png')">Add</button>
+            </div>
+        </div>
+
+        <div class="modal-group">
+            <label class="modal-label">GLB File</label>
+            <div class="file-selector">
+                <select id="glbSelector">
+                    <option value="">-- Select GLB --</option>
+                </select>
+                <button onclick="addFileToItem('glb')">Add</button>
+            </div>
+        </div>
+
+        <div class="modal-group">
+            <label class="modal-label">OBJ File</label>
+            <div class="file-selector">
+                <select id="objSelector">
+                    <option value="">-- Select OBJ --</option>
+                </select>
+                <button onclick="addFileToItem('obj')">Add</button>
+            </div>
+        </div>
+
+        <div class="modal-group">
+            <label class="modal-label">FBX File</label>
+            <div class="file-selector">
+                <select id="fbxSelector">
+                    <option value="">-- Select FBX --</option>
+                </select>
+                <button onclick="addFileToItem('fbx')">Add</button>
+            </div>
+        </div>
+
+        <div class="modal-group">
+            <label class="modal-label">STL File</label>
+            <div class="file-selector">
+                <select id="stlSelector">
+                    <option value="">-- Select STL --</option>
+                </select>
+                <button onclick="addFileToItem('stl')">Add</button>
+            </div>
+        </div>
+
+        <div class="modal-buttons">
+            <button class="modal-btn save" onclick="saveEditedItem()">Save</button>
+            <button class="modal-btn close" onclick="closeEditModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
 <!-- SUBTLE SUGGESTIONS BOX (TOP LEFT) -->
 <div class="suggestions-floating" id="suggestions-floating">
     <div class="suggestions-toggle" onclick="toggleSuggestions()">
@@ -729,6 +943,9 @@
 </section>
 
 <script>
+let currentEditingIndex = -1;
+let allUploadedFiles = [];
+
 function scrollToSection(id) {
     const el = document.getElementById(id);
     if (!el) return;
@@ -793,10 +1010,8 @@ const suggestionText = document.getElementById('suggestion-text');
 const submitBtn = document.getElementById('submit-suggestion');
 const suggestionsArchive = document.getElementById('suggestions-archive');
 
-// Load suggestions from localStorage
 let suggestions = JSON.parse(localStorage.getItem('lowdangles_suggestions')) || [];
 
-// Display suggestions
 function displaySuggestions() {
     if (suggestions.length === 0) {
         suggestionsArchive.innerHTML = '<p style="text-align: center; color: var(--neon-yellow); font-size: 0.7rem;">No suggestions yet.</p>';
@@ -811,14 +1026,12 @@ function displaySuggestions() {
     `).join('');
 }
 
-// Escape HTML to prevent XSS
 function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
 }
 
-// Submit suggestion
 submitBtn.addEventListener('click', addSuggestion);
 suggestionText.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') addSuggestion();
@@ -839,16 +1052,12 @@ function addSuggestion() {
     displaySuggestions();
 }
 
-// Initial load suggestions
 displaySuggestions();
 
 /* ===== GALLERY ITEMS PERSISTENCE ===== */
 const gallery = document.getElementById("gallery");
-
-// Load items from localStorage
 let galleryItems = JSON.parse(localStorage.getItem('lowdangles_items')) || [];
 
-// Display saved items
 function displayGalleryItems() {
     gallery.innerHTML = '';
     galleryItems.forEach((itemData, index) => {
@@ -856,7 +1065,6 @@ function displayGalleryItems() {
     });
 }
 
-// Create item element from saved data
 function createItemElement(itemData, index) {
     const item = document.createElement("div");
     item.className = "item";
@@ -890,8 +1098,9 @@ function createItemElement(itemData, index) {
             <div class="item-buttons">
                 ${buttonsHtml || '<span style="color: var(--neon-yellow); font-size: 0.7rem;">No files</span>'}
             </div>
-            <div class="item-delete">
-                <button onclick="deleteGalleryItem(${index})">Delete</button>
+            <div class="item-actions">
+                <button class="edit-btn" onclick="openEditModal(${index})">Edit</button>
+                <button class="delete-btn" onclick="deleteGalleryItem(${index})">Delete</button>
             </div>
         </div>
     `;
@@ -899,15 +1108,70 @@ function createItemElement(itemData, index) {
     gallery.appendChild(item);
 }
 
-// Delete item from gallery
 function deleteGalleryItem(index) {
     galleryItems.splice(index, 1);
     localStorage.setItem('lowdangles_items', JSON.stringify(galleryItems));
     displayGalleryItems();
 }
 
-// Initial load of gallery items
 displayGalleryItems();
+
+/* ===== EDIT MODAL ===== */
+function openEditModal(index) {
+    currentEditingIndex = index;
+    const item = galleryItems[index];
+
+    document.getElementById('editTitle').value = item.title;
+
+    // Populate selectors with all files
+    populateFileSelectors(item);
+
+    document.getElementById('editModal').classList.add('active');
+}
+
+function closeEditModal() {
+    document.getElementById('editModal').classList.remove('active');
+    currentEditingIndex = -1;
+}
+
+function populateFileSelectors(currentItem) {
+    const types = ['png', 'glb', 'obj', 'fbx', 'stl'];
+    
+    types.forEach(type => {
+        const selector = document.getElementById(type + 'Selector');
+        selector.innerHTML = '<option value="">-- Select ' + type.toUpperCase() + ' --</option>';
+        
+        allUploadedFiles.forEach((file, idx) => {
+            const option = document.createElement('option');
+            option.value = idx;
+            option.textContent = file.name;
+            if (currentItem[type] === file.dataUrl) {
+                option.selected = true;
+            }
+            selector.appendChild(option);
+        });
+    });
+}
+
+function addFileToItem(type) {
+    const selector = document.getElementById(type + 'Selector');
+    const selectedIdx = selector.value;
+
+    if (selectedIdx === '') return;
+
+    const file = allUploadedFiles[selectedIdx];
+    galleryItems[currentEditingIndex][type] = file.dataUrl;
+
+    populateFileSelectors(galleryItems[currentEditingIndex]);
+}
+
+function saveEditedItem() {
+    galleryItems[currentEditingIndex].title = document.getElementById('editTitle').value;
+    localStorage.setItem('lowdangles_items', JSON.stringify(galleryItems));
+
+    closeEditModal();
+    displayGalleryItems();
+}
 
 /* ===== DROP ZONE FUNCTIONALITY ===== */
 const dropzone = document.getElementById("dropzone");
@@ -935,8 +1199,6 @@ function processFiles(files) {
     files.forEach(file => {
         const name = file.name.toLowerCase();
         const ext = name.split('.').pop();
-
-        // Extract base name (everything before the last extension)
         const baseName = name.slice(0, -(ext.length + 1));
 
         if (!groups[baseName]) groups[baseName] = [];
@@ -949,7 +1211,6 @@ function processFiles(files) {
 }
 
 function addItemToGallery(baseName, fileData) {
-    // Find files by extension
     const pngFile = fileData.find(f => f.ext === 'png')?.file;
     const glbFile = fileData.find(f => f.ext === 'glb')?.file;
     const objFile = fileData.find(f => f.ext === 'obj')?.file;
@@ -958,32 +1219,29 @@ function addItemToGallery(baseName, fileData) {
 
     const title = baseName || ("untitled" + String(Date.now()).slice(-4));
 
-    // Convert files to base64 data URLs for localStorage
     const filePromises = [];
 
-    if (pngFile) filePromises.push(fileToBase64(pngFile).then(data => ({ key: 'png', data })));
-    if (glbFile) filePromises.push(fileToBase64(glbFile).then(data => ({ key: 'glb', data })));
-    if (objFile) filePromises.push(fileToBase64(objFile).then(data => ({ key: 'obj', data })));
-    if (fbxFile) filePromises.push(fileToBase64(fbxFile).then(data => ({ key: 'fbx', data })));
-    if (stlFile) filePromises.push(fileToBase64(stlFile).then(data => ({ key: 'stl', data })));
+    if (pngFile) filePromises.push(fileToBase64(pngFile).then(data => ({ key: 'png', data, name: pngFile.name })));
+    if (glbFile) filePromises.push(fileToBase64(glbFile).then(data => ({ key: 'glb', data, name: glbFile.name })));
+    if (objFile) filePromises.push(fileToBase64(objFile).then(data => ({ key: 'obj', data, name: objFile.name })));
+    if (fbxFile) filePromises.push(fileToBase64(fbxFile).then(data => ({ key: 'fbx', data, name: fbxFile.name })));
+    if (stlFile) filePromises.push(fileToBase64(stlFile).then(data => ({ key: 'stl', data, name: stlFile.name })));
 
     Promise.all(filePromises).then(results => {
         const itemData = { title };
 
-        results.forEach(({ key, data }) => {
+        results.forEach(({ key, data, name }) => {
             itemData[key] = data;
+            allUploadedFiles.push({ name: name + ' (' + key.toUpperCase() + ')', dataUrl: data });
         });
 
-        // Add to gallery items array
         galleryItems.push(itemData);
         localStorage.setItem('lowdangles_items', JSON.stringify(galleryItems));
 
-        // Refresh display
         displayGalleryItems();
     });
 }
 
-// Convert file to base64 data URL
 function fileToBase64(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
