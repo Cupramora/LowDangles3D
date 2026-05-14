@@ -1119,13 +1119,13 @@ function createItemElement(itemData, index) {
 function deleteGalleryItem(index) {
     galleryItems.splice(index, 1);
     localStorage.setItem('lowdangles_items', JSON.stringify(galleryItems));
-rebuildFileList();
+    rebuildFileList();
     displayGalleryItems();
 }
     
 // Initial load - rebuild file list FIRST, then display items
 rebuildFileList();
-    displayGalleryItems();
+displayGalleryItems();
 
 /* ===== EDIT MODAL ===== */
 function openEditModal(index) {
@@ -1133,7 +1133,7 @@ function openEditModal(index) {
     const item = galleryItems[index];
 
     document.getElementById('editTitle').value = item.title;
-// Populate selectrs with all files
+    // Populate selectors with all files
     populateFileSelectors(item);
 
     document.getElementById('editModal').classList.add('active');
@@ -1180,7 +1180,7 @@ function saveEditedItem() {
     localStorage.setItem('lowdangles_items', JSON.stringify(galleryItems));
 
     closeEditModal();
-  rebuildFileList();
+    rebuildFileList();
     displayGalleryItems();
 }
 
@@ -1248,7 +1248,7 @@ function addItemToGallery(baseName, fileData) {
         galleryItems.push(itemData);
         localStorage.setItem('lowdangles_items', JSON.stringify(galleryItems));
         
-      rebuildFileList();
+        rebuildFileList();
         displayGalleryItems();
     });
 }
