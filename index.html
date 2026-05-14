@@ -1119,7 +1119,7 @@ function createItemElement(itemData, index) {
 function deleteGalleryItem(index) {
     galleryItems.splice(index, 1);
     localStorage.setItem('lowdangles_items', JSON.stringify(galleryItems));
-rebuildfilelist();
+rebuildFileList();
     displayGalleryItems();
 }
     
