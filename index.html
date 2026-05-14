@@ -944,7 +944,7 @@
 
 <script>
 let currentEditingIndex = -1;
-let allUploadedFiles = [];
+let allUploadedFiles = {};
 
 function scrollToSection(id) {
     const el = document.getElementById(id);
@@ -955,7 +955,6 @@ function scrollToSection(id) {
     });
 }
 
-/* Toggle suggestions box */
 function toggleSuggestions() {
     const content = document.getElementById('suggestions-content');
     const floating = document.getElementById('suggestions-floating');
@@ -966,7 +965,6 @@ function toggleSuggestions() {
     icon.textContent = content.classList.contains('hidden') ? '▶' : '▼';
 }
 
-/* Open 3D Viewer */
 function openViewer(modelPath, title) {
     const mv = document.getElementById('mv');
     mv.setAttribute('src', modelPath);
@@ -980,12 +978,10 @@ function openViewer(modelPath, title) {
     scrollToSection('viewer-section');
 }
 
-/* Close 3D Viewer */
 function closeViewer() {
     document.getElementById('viewer').classList.remove('active');
 }
 
-/* SEARCH + CATEGORY FILTER */
 document.getElementById('search').addEventListener('input', filterItems);
 document.getElementById('category').addEventListener('change', filterItems);
 
@@ -1058,18 +1054,6 @@ displaySuggestions();
 const gallery = document.getElementById("gallery");
 let galleryItems = JSON.parse(localStorage.getItem('lowdangles_items')) || [];
 
-// REBUILD FILE LIST FROM SAVED ITEMS
-function rebuildFileList() {
-    allUploadedFiles = [];
-    galleryItems.forEach(item => {
-        if (item.png) allUploadedFiles.push({ name: item.title + ' (PNG)', dataUrl: item.png });
-        if (item.glb) allUploadedFiles.push({ name: item.title + ' (GLB)', dataUrl: item.glb });
-        if (item.obj) allUploadedFiles.push({ name: item.title + ' (OBJ)', dataUrl: item.obj });
-        if (item.fbx) allUploadedFiles.push({ name: item.title + ' (FBX)', dataUrl: item.fbx });
-        if (item.stl) allUploadedFiles.push({ name: item.title + ' (STL)', dataUrl: item.stl });
-    });
-}
-
 function displayGalleryItems() {
     gallery.innerHTML = '';
     galleryItems.forEach((itemData, index) => {
@@ -1123,12 +1107,9 @@ function createItemElement(itemData, index) {
 function deleteGalleryItem(index) {
     galleryItems.splice(index, 1);
     localStorage.setItem('lowdangles_items', JSON.stringify(galleryItems));
-    rebuildFileList();
     displayGalleryItems();
 }
 
-// Initial load - rebuild file list FIRST, then display items
-rebuildFileList();
 displayGalleryItems();
 
 /* ===== EDIT MODAL ===== */
@@ -1138,7 +1119,6 @@ function openEditModal(index) {
 
     document.getElementById('editTitle').value = item.title;
 
-    // Populate selectors with all files
     populateFileSelectors(item);
 
     document.getElementById('editModal').classList.add('active');
@@ -1156,26 +1136,29 @@ function populateFileSelectors(currentItem) {
         const selector = document.getElementById(type + 'Selector');
         selector.innerHTML = '<option value="">-- Select ' + type.toUpperCase() + ' --</option>';
         
-        allUploadedFiles.forEach((file, idx) => {
-            const option = document.createElement('option');
-            option.value = idx;
-            option.textContent = file.name;
-            if (currentItem[type] === file.dataUrl) {
-                option.selected = true;
+        Object.keys(allUploadedFiles).forEach(key => {
+            const fileData = allUploadedFiles[key];
+            if (fileData.ext === type) {
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = fileData.name;
+                if (currentItem[type] === fileData.dataUrl) {
+                    option.selected = true;
+                }
+                selector.appendChild(option);
             }
-            selector.appendChild(option);
         });
     });
 }
 
 function addFileToItem(type) {
     const selector = document.getElementById(type + 'Selector');
-    const selectedIdx = selector.value;
+    const selectedKey = selector.value;
 
-    if (selectedIdx === '') return;
+    if (selectedKey === '') return;
 
-    const file = allUploadedFiles[selectedIdx];
-    galleryItems[currentEditingIndex][type] = file.dataUrl;
+    const fileData = allUploadedFiles[selectedKey];
+    galleryItems[currentEditingIndex][type] = fileData.dataUrl;
 
     populateFileSelectors(galleryItems[currentEditingIndex]);
 }
@@ -1185,7 +1168,6 @@ function saveEditedItem() {
     localStorage.setItem('lowdangles_items', JSON.stringify(galleryItems));
 
     closeEditModal();
-    rebuildFileList();
     displayGalleryItems();
 }
 
@@ -1237,23 +1219,23 @@ function addItemToGallery(baseName, fileData) {
 
     const filePromises = [];
 
-    if (pngFile) filePromises.push(fileToBase64(pngFile).then(data => ({ key: 'png', data, name: pngFile.name })));
-    if (glbFile) filePromises.push(fileToBase64(glbFile).then(data => ({ key: 'glb', data, name: glbFile.name })));
-    if (objFile) filePromises.push(fileToBase64(objFile).then(data => ({ key: 'obj', data, name: objFile.name })));
-    if (fbxFile) filePromises.push(fileToBase64(fbxFile).then(data => ({ key: 'fbx', data, name: fbxFile.name })));
-    if (stlFile) filePromises.push(fileToBase64(stlFile).then(data => ({ key: 'stl', data, name: stlFile.name })));
+    if (pngFile) filePromises.push(fileToBase64(pngFile).then(data => ({ key: 'png_' + Date.now() + Math.random(), ext: 'png', data, name: pngFile.name })));
+    if (glbFile) filePromises.push(fileToBase64(glbFile).then(data => ({ key: 'glb_' + Date.now() + Math.random(), ext: 'glb', data, name: glbFile.name })));
+    if (objFile) filePromises.push(fileToBase64(objFile).then(data => ({ key: 'obj_' + Date.now() + Math.random(), ext: 'obj', data, name: objFile.name })));
+    if (fbxFile) filePromises.push(fileToBase64(fbxFile).then(data => ({ key: 'fbx_' + Date.now() + Math.random(), ext: 'fbx', data, name: fbxFile.name })));
+    if (stlFile) filePromises.push(fileToBase64(stlFile).then(data => ({ key: 'stl_' + Date.now() + Math.random(), ext: 'stl', data, name: stlFile.name })));
 
     Promise.all(filePromises).then(results => {
         const itemData = { title };
 
-        results.forEach(({ key, data }) => {
-            itemData[key] = data;
+        results.forEach(({ key, ext, data, name }) => {
+            itemData[ext] = data;
+            allUploadedFiles[key] = { name, ext, dataUrl: data };
         });
 
         galleryItems.push(itemData);
         localStorage.setItem('lowdangles_items', JSON.stringify(galleryItems));
 
-        rebuildFileList();
         displayGalleryItems();
     });
 }
