@@ -1058,6 +1058,18 @@ displaySuggestions();
 const gallery = document.getElementById("gallery");
 let galleryItems = JSON.parse(localStorage.getItem('lowdangles_items')) || [];
 
+// REBUILD FILE LIST FROM SAVED ITEMS
+function rebuildFileList() {
+    allUploadedFiles = [];
+    galleryItems.forEach(item => {
+        if (item.png) allUploadedFiles.push({ name: item.title + ' (PNG)', dataUrl: item.png });
+        if (item.glb) allUploadedFiles.push({ name: item.title + ' (GLB)', dataUrl: item.glb });
+        if (item.obj) allUploadedFiles.push({ name: item.title + ' (OBJ)', dataUrl: item.obj });
+        if (item.fbx) allUploadedFiles.push({ name: item.title + ' (FBX)', dataUrl: item.fbx });
+        if (item.stl) allUploadedFiles.push({ name: item.title + ' (STL)', dataUrl: item.stl });
+    });
+}
+
 function displayGalleryItems() {
     gallery.innerHTML = '';
     galleryItems.forEach((itemData, index) => {
@@ -1111,9 +1123,12 @@ function createItemElement(itemData, index) {
 function deleteGalleryItem(index) {
     galleryItems.splice(index, 1);
     localStorage.setItem('lowdangles_items', JSON.stringify(galleryItems));
+    rebuildFileList();
     displayGalleryItems();
 }
 
+// Initial load - rebuild file list FIRST, then display items
+rebuildFileList();
 displayGalleryItems();
 
 /* ===== EDIT MODAL ===== */
@@ -1170,6 +1185,7 @@ function saveEditedItem() {
     localStorage.setItem('lowdangles_items', JSON.stringify(galleryItems));
 
     closeEditModal();
+    rebuildFileList();
     displayGalleryItems();
 }
 
@@ -1230,14 +1246,14 @@ function addItemToGallery(baseName, fileData) {
     Promise.all(filePromises).then(results => {
         const itemData = { title };
 
-        results.forEach(({ key, data, name }) => {
+        results.forEach(({ key, data }) => {
             itemData[key] = data;
-            allUploadedFiles.push({ name: name + ' (' + key.toUpperCase() + ')', dataUrl: data });
         });
 
         galleryItems.push(itemData);
         localStorage.setItem('lowdangles_items', JSON.stringify(galleryItems));
 
+        rebuildFileList();
         displayGalleryItems();
     });
 }
