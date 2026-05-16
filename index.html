@@ -482,6 +482,102 @@
             box-shadow: 0 0 30px #0ff;
         }
 
+        .dropzone-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        #dropzone-files {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid rgba(0, 246, 255, 0.3);
+            border-radius: 8px;
+            padding: 10px;
+            background: rgba(0, 246, 255, 0.05);
+            display: none;
+        }
+
+        #dropzone-files.active {
+            display: block;
+        }
+
+        .dropzone-file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            background: rgba(0, 246, 255, 0.1);
+            border-radius: 4px;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+            color: var(--neon-yellow);
+        }
+
+        .dropzone-file-item .file-name {
+            flex: 1;
+        }
+
+        .dropzone-file-item .file-remove {
+            background: rgba(255, 0, 0, 0.6);
+            color: #fff;
+            border: none;
+            padding: 3px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .dropzone-file-item .file-remove:hover {
+            background: rgba(255, 0, 0, 0.9);
+        }
+
+        .dropzone-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            display: none;
+        }
+
+        .dropzone-actions.active {
+            display: flex;
+        }
+
+        .dropzone-actions button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 10px;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+        }
+
+        .dropzone-actions .submit-btn {
+            background: var(--neon-cyan);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-cyan);
+            flex: 1;
+        }
+
+        .dropzone-actions .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px var(--neon-cyan);
+        }
+
+        .dropzone-actions .clear-btn {
+            background: #111;
+            color: var(--neon-magenta);
+            box-shadow: 0 0 10px rgba(255, 0, 255, 0.6);
+            flex: 1;
+        }
+
+        .dropzone-actions .clear-btn:hover {
+            transform: translateY(-2px);
+        }
+
         /* ===== GALLERY / MATRIX GRID (8 COLUMNS) ===== */
 
         .gallery-section {
@@ -819,52 +915,9 @@
         </div>
 
         <div class="modal-group">
-            <label class="modal-label">PNG Thumbnail</label>
-            <div class="file-selector">
-                <select id="pngSelector">
-                    <option value="">-- Select PNG --</option>
-                </select>
-                <button onclick="addFileToItem('png')">Add</button>
-            </div>
-        </div>
-
-        <div class="modal-group">
-            <label class="modal-label">GLB File</label>
-            <div class="file-selector">
-                <select id="glbSelector">
-                    <option value="">-- Select GLB --</option>
-                </select>
-                <button onclick="addFileToItem('glb')">Add</button>
-            </div>
-        </div>
-
-        <div class="modal-group">
-            <label class="modal-label">OBJ File</label>
-            <div class="file-selector">
-                <select id="objSelector">
-                    <option value="">-- Select OBJ --</option>
-                </select>
-                <button onclick="addFileToItem('obj')">Add</button>
-            </div>
-        </div>
-
-        <div class="modal-group">
-            <label class="modal-label">FBX File</label>
-            <div class="file-selector">
-                <select id="fbxSelector">
-                    <option value="">-- Select FBX --</option>
-                </select>
-                <button onclick="addFileToItem('fbx')">Add</button>
-            </div>
-        </div>
-
-        <div class="modal-group">
-            <label class="modal-label">STL File</label>
-            <div class="file-selector">
-                <select id="stlSelector">
-                    <option value="">-- Select STL --</option>
-                </select>
-                <button onclick="addFileToItem('stl')">Add</button>
+            <label class="modal-label">Item Files</label>
+            <div id="editFilesList" style="max-height: 200px; overflow-y: auto; border: 1px solid rgba(0, 246, 255, 0.2); border-radius: 4px; padding: 8px;">
+                <!-- Files will be listed here -->
             </div>
         </div>
 
@@ -921,8 +974,17 @@
 </header>
 
 <section id="dropzone-section">
-    <div id="dropzone">
-        <p>Drop PNG + GLB + OBJ + FBX + STL files here</p>
+    <div id="dropzone" class="dropzone-container">
+        <p style="margin: 0; margin-bottom: 20px;">Drop PNG + GLB + OBJ + FBX + STL files here</p>
+        
+        <div id="dropzone-files">
+            <!-- Dropped files will appear here -->
+        </div>
+
+        <div id="dropzone-actions" class="dropzone-actions">
+            <button class="submit-btn" onclick="submitDroppedFiles()">SUBMIT</button>
+            <button class="clear-btn" onclick="clearDroppedFiles()">CLEAR</button>
+        </div>
     </div>
 </section>
 
@@ -945,7 +1007,7 @@
 
 <script>
 let currentEditingIndex = -1;
-let allUploadedFiles = [];
+let droppedFiles = [];
 
 function scrollToSection(id) {
     const el = document.getElementById(id);
@@ -1027,132 +1089,101 @@ dropzone.addEventListener('drop', (e) => {
     dropzone.classList.remove('dragover');
     
     const files = e.dataTransfer.files;
-    processDroppedFiles(files);
+    addFilesToDropzone(files);
 });
 
-function getBaseName(filename) {
-    // Extract base name by removing extension and trailing numbers
-    // e.g., "martini_glass001.obj" -> "martini_glass"
-    const nameWithoutExt = filename.substring(0, filename.lastIndexOf('.'));
-    // Remove trailing numbers (like 001, 002)
-    return nameWithoutExt.replace(/\d+$/, '');
-}
-
-function processDroppedFiles(files) {
-    // Group files by base name
-    const groupedFiles = {};
+function addFilesToDropzone(files) {
     const fileArray = Array.from(files);
-
-    // First pass: read all files and group them
-    for (let i = 0; i < fileArray.length; i++) {
-        const file = fileArray[i];
+    
+    for (let file of fileArray) {
         const ext = file.name.split('.').pop().toLowerCase();
-        const baseName = getBaseName(file.name);
         
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            if (!groupedFiles[baseName]) {
-                groupedFiles[baseName] = {
-                    title: baseName,
-                    thumbnail: null,
-                    models: {
-                        glb: null,
-                        obj: null,
-                        fbx: null,
-                        stl: null
-                    },
-                    fileCount: 0,
-                    totalFiles: fileArray.filter(f => getBaseName(f.name) === baseName).length
-                };
-            }
-
-            const itemData = groupedFiles[baseName];
-            const dataUrl = e.target.result;
-
-            if (ext === 'png') {
-                itemData.thumbnail = dataUrl;
-            } else if (['glb', 'obj', 'fbx', 'stl'].includes(ext)) {
-                itemData.models[ext] = {
+        // Only accept valid extensions
+        if (['png', 'glb', 'obj', 'fbx', 'stl'].includes(ext)) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                droppedFiles.push({
                     name: file.name,
-                    data: dataUrl
-                };
-            }
-
-            itemData.fileCount++;
-
-            // Check if all files for this group have been processed
-            if (itemData.fileCount === itemData.totalFiles) {
-                addItem(itemData);
-            }
-        };
-
-        reader.readAsDataURL(file);
+                    ext: ext,
+                    data: e.target.result
+                });
+                updateDropzoneDisplay();
+            };
+            reader.readAsDataURL(file);
+        }
     }
 }
 
-function addItem(itemData) {
-    const gallery = document.getElementById('gallery');
-    
-    // Check if item with same base name already exists
-    const existingItem = Array.from(gallery.children).find(
-        item => item.getAttribute('data-name') === itemData.title
-    );
+function updateDropzoneDisplay() {
+    const filesList = document.getElementById('dropzone-files');
+    const actions = document.getElementById('dropzone-actions');
 
-    if (existingItem) {
-        // Update existing item with new files
-        updateItemWithNewFiles(existingItem, itemData);
-    } else {
-        // Create new card
-        const item = createItemCard(itemData);
-        gallery.appendChild(item);
+    filesList.innerHTML = '';
+
+    if (droppedFiles.length === 0) {
+        filesList.classList.remove('active');
+        actions.classList.remove('active');
+        return;
     }
+
+    filesList.classList.add('active');
+    actions.classList.add('active');
+
+    droppedFiles.forEach((file, index) => {
+        const fileItem = document.createElement('div');
+        fileItem.className = 'dropzone-file-item';
+        fileItem.innerHTML = `
+            <span class="file-name">${file.name}</span>
+            <button class="file-remove" onclick="removeDroppedFile(${index})">✕</button>
+        `;
+        filesList.appendChild(fileItem);
+    });
 }
 
-function updateItemWithNewFiles(existingItem, newData) {
-    // Update thumbnail if new one provided
-    if (newData.thumbnail) {
-        const img = existingItem.querySelector('.item img');
-        if (img) {
-            img.src = newData.thumbnail;
-        } else {
-            const innerDiv = existingItem.querySelector('.item-inner');
-            const img = document.createElement('img');
-            img.src = newData.thumbnail;
-            img.alt = newData.title;
-            innerDiv.insertBefore(img, innerDiv.querySelector('.item-buttons'));
+function removeDroppedFile(index) {
+    droppedFiles.splice(index, 1);
+    updateDropzoneDisplay();
+}
+
+function clearDroppedFiles() {
+    droppedFiles = [];
+    updateDropzoneDisplay();
+}
+
+function submitDroppedFiles() {
+    if (droppedFiles.length === 0) return;
+
+    // Create item data from dropped files
+    const itemData = {
+        title: 'New Item',
+        thumbnail: null,
+        models: {
+            glb: null,
+            obj: null,
+            fbx: null,
+            stl: null
+        },
+        files: droppedFiles
+    };
+
+    // Organize files
+    for (let file of droppedFiles) {
+        if (file.ext === 'png') {
+            itemData.thumbnail = file.data;
+        } else if (['glb', 'obj', 'fbx', 'stl'].includes(file.ext)) {
+            itemData.models[file.ext] = {
+                name: file.name,
+                data: file.data
+            };
         }
     }
 
-    // Update model buttons
-    const buttonsDiv = existingItem.querySelector('.item-buttons');
-    
-    for (const [format, modelData] of Object.entries(newData.models)) {
-        if (modelData) {
-            // Check if button for this format already exists
-            const existingBtn = Array.from(buttonsDiv.children).find(
-                btn => btn.textContent === format.toUpperCase()
-            );
+    // Create card
+    const item = createItemCard(itemData);
+    document.getElementById('gallery').appendChild(item);
 
-            if (existingBtn) {
-                // Update existing button
-                existingBtn.onclick = (e) => {
-                    e.preventDefault();
-                    openViewer(modelData.data, newData.title);
-                };
-            } else {
-                // Create new button
-                const link = document.createElement('a');
-                link.href = '#';
-                link.className = 'btn';
-                link.textContent = format.toUpperCase();
-                link.onclick = (e) => {
-                    e.preventDefault();
-                    openViewer(modelData.data, newData.title);
-                };
-                buttonsDiv.appendChild(link);
-            }
-        }
-    }
+    // Clear dropzone
+    clearDroppedFiles();
 }
 
 function createItemCard(data) {
@@ -1160,6 +1191,7 @@ function createItemCard(data) {
     itemDiv.className = 'item';
     itemDiv.setAttribute('data-name', data.title);
     itemDiv.setAttribute('data-category', 'all');
+    itemDiv.setAttribute('data-files', JSON.stringify(data.files));
 
     // Add glitch overlay
     const glitchDiv = document.createElement('div');
@@ -1229,44 +1261,53 @@ function createItemCard(data) {
 function openEditModal(itemElement) {
     currentEditingIndex = Array.from(document.getElementById('gallery').children).indexOf(itemElement);
     const title = itemElement.getAttribute('data-name');
+    const filesJSON = itemElement.getAttribute('data-files');
+    const files = JSON.parse(filesJSON || '[]');
+
     document.getElementById('editTitle').value = title;
 
-    // Update file selectors with available files
-    const pngSelector = document.getElementById('pngSelector');
-    const glbSelector = document.getElementById('glbSelector');
-    const objSelector = document.getElementById('objSelector');
-    const fbxSelector = document.getElementById('fbxSelector');
-    const stlSelector = document.getElementById('stlSelector');
+    // Display files in edit modal
+    const filesList = document.getElementById('editFilesList');
+    filesList.innerHTML = '';
 
-    // Clear previous options
-    [pngSelector, glbSelector, objSelector, fbxSelector, stlSelector].forEach(sel => {
-        while (sel.children.length > 1) sel.removeChild(sel.lastChild);
-    });
-
-    // Add uploaded files to selectors
-    allUploadedFiles.forEach((file, index) => {
-        const ext = file.name.split('.').pop().toLowerCase();
-        const option = document.createElement('option');
-        option.value = index;
-        option.textContent = file.name;
-
-        if (ext === 'png') pngSelector.appendChild(option);
-        else if (ext === 'glb') glbSelector.appendChild(option);
-        else if (ext === 'obj') objSelector.appendChild(option);
-        else if (ext === 'fbx') fbxSelector.appendChild(option);
-        else if (ext === 'stl') stlSelector.appendChild(option);
+    files.forEach((file, index) => {
+        const fileItem = document.createElement('div');
+        fileItem.className = 'dropzone-file-item';
+        fileItem.innerHTML = `
+            <span class="file-name">${file.name}</span>
+            <button class="file-remove" onclick="removeFileFromItem(${index})">✕</button>
+        `;
+        filesList.appendChild(fileItem);
     });
 
     document.getElementById('editModal').classList.add('active');
 }
 
+function removeFileFromItem(fileIndex) {
+    const items = document.getElementById('gallery').children;
+    if (currentEditingIndex >= 0 && currentEditingIndex < items.length) {
+        let files = JSON.parse(items[currentEditingIndex].getAttribute('data-files') || '[]');
+        files.splice(fileIndex, 1);
+        items[currentEditingIndex].setAttribute('data-files', JSON.stringify(files));
+        
+        // Refresh modal display
+        const filesList = document.getElementById('editFilesList');
+        filesList.innerHTML = '';
+        files.forEach((file, index) => {
+            const fileItem = document.createElement('div');
+            fileItem.className = 'dropzone-file-item';
+            fileItem.innerHTML = `
+                <span class="file-name">${file.name}</span>
+                <button class="file-remove" onclick="removeFileFromItem(${index})">✕</button>
+            `;
+            filesList.appendChild(fileItem);
+        });
+    }
+}
+
 function closeEditModal() {
     document.getElementById('editModal').classList.remove('active');
     currentEditingIndex = -1;
-}
-
-function addFileToItem(fileType) {
-    console.log('Add ' + fileType + ' file');
 }
 
 function saveEditedItem() {
@@ -1294,22 +1335,14 @@ function submitSuggestion() {
 
     if (!text) return;
 
-    // Load suggestions from localStorage
     let suggestions = JSON.parse(localStorage.getItem('suggestions')) || [];
-
-    // Add new suggestion
     suggestions.push({
         text: text,
         timestamp: new Date().toLocaleString()
     });
 
-    // Save to localStorage
     localStorage.setItem('suggestions', JSON.stringify(suggestions));
-
-    // Update archive display
     updateSuggestionsArchive();
-
-    // Clear input
     input.value = '';
 }
 
