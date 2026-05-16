@@ -640,6 +640,7 @@
             mix-blend-mode: soft-light;
             opacity: 0;
             animation: card-glitch 4s infinite;
+            z-index: 0;
         }
 
         @keyframes card-glitch {
@@ -998,143 +999,180 @@ function filterItems() {
         let matchesSearch = name.includes(search);
         let matchesCategory = (category === 'all' || category === cat);
 
-        item.style.display = (matchesSearch && matchesCategory) ? '' : 'none';
+        if (matchesSearch && matchesCategory) {
+            item.style.display = '';
+        } else {
+            item.style.display = 'none';
+        }
     });
 }
 
-/* ===== SUGGESTIONS FUNCTIONALITY ===== */
-const suggestionText = document.getElementById('suggestion-text');
-const submitBtn = document.getElementById('submit-suggestion');
-const suggestionsArchive = document.getElementById('suggestions-archive');
+/* Drop Zone Handler */
+const dropzone = document.getElementById('dropzone');
 
-let suggestions = JSON.parse(localStorage.getItem('lowdangles_suggestions')) || [];
-
-function displaySuggestions() {
-    if (suggestions.length === 0) {
-        suggestionsArchive.innerHTML = '<p style="text-align: center; color: var(--neon-yellow); font-size: 0.7rem;">No suggestions yet.</p>';
-        return;
-    }
-
-    suggestionsArchive.innerHTML = suggestions.map(s => `
-        <div class="suggestion-item">
-            <div class="suggestion-text">${escapeHtml(s.text)}</div>
-            <div class="suggestion-meta">${s.date} @ ${s.time}</div>
-        </div>
-    `).join('');
-}
-
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
-submitBtn.addEventListener('click', addSuggestion);
-suggestionText.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') addSuggestion();
+dropzone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropzone.classList.add('dragover');
 });
 
-function addSuggestion() {
-    const text = suggestionText.value.trim();
-    if (!text) return;
+dropzone.addEventListener('dragleave', () => {
+    dropzone.classList.remove('dragover');
+});
 
-    const now = new Date();
-    const date = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-
-    suggestions.unshift({ text, date, time });
-    localStorage.setItem('lowdangles_suggestions', JSON.stringify(suggestions));
-
-    suggestionText.value = '';
-    displaySuggestions();
-}
-
-displaySuggestions();
-
-/* ===== GALLERY ITEMS PERSISTENCE ===== */
-const gallery = document.getElementById("gallery");
-let galleryItems = JSON.parse(localStorage.getItem('lowdangles_items')) || [];
-// REBUILD FILE LIST FROM SAVED ITEMS
-function rebuildFileList() {
-    allUploadedFiles = [];
-    galleryItems.forEach(item => {
-        if (item.png) allUploadedFiles.push({ name: item.title + ' (PNG)', dataUrl: item.png });
-        if (item.glb) allUploadedFiles.push({ name: item.title + ' (GLB)', dataUrl: item.glb });
-        if (item.obj) allUploadedFiles.push({ name: item.title + ' (OBJ)', dataUrl: item.obj });
-        if (item.fbx) allUploadedFiles.push({ name: item.title + ' (FBX)', dataUrl: item.fbx });
-        if (item.stl) allUploadedFiles.push({ name: item.title + ' (STL)', dataUrl: item.stl });
-    });
-}
+dropzone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropzone.classList.remove('dragover');
     
-function displayGalleryItems() {
-    gallery.innerHTML = '';
-    galleryItems.forEach((itemData, index) => {
-        createItemElement(itemData, index);
-    });
+    const files = e.dataTransfer.files;
+    processDroppedFiles(files);
+});
+
+function processDroppedFiles(files) {
+    let itemData = {
+        title: 'New Item',
+        thumbnail: null,
+        models: {
+            glb: null,
+            obj: null,
+            fbx: null,
+            stl: null
+        }
+    };
+
+    for (let file of files) {
+        const ext = file.name.split('.').pop().toLowerCase();
+        const reader = new FileReader();
+
+        reader.onload = (e) => {
+            const dataUrl = e.target.result;
+
+            if (ext === 'png') {
+                itemData.thumbnail = dataUrl;
+            } else if (['glb', 'obj', 'fbx', 'stl'].includes(ext)) {
+                itemData.models[ext] = {
+                    name: file.name,
+                    data: dataUrl
+                };
+            }
+
+            // Check if all files for this item have been processed
+            const allFilesProcessed = files.length === Object.keys(itemData.models).filter(k => itemData.models[k] !== null).length + (itemData.thumbnail ? 1 : 0);
+            if (allFilesProcessed) {
+                addItem(itemData);
+            }
+        };
+
+        reader.readAsDataURL(file);
+    }
 }
 
-function createItemElement(itemData, index) {
-    const item = document.createElement("div");
-    item.className = "item";
-    item.setAttribute("data-name", itemData.title);
-    item.setAttribute("data-category", "props");
-    item.setAttribute("data-index", index);
-
-    let buttonsHtml = '';
-
-    if (itemData.glb) {
-        buttonsHtml += `<a class="btn" href="#" onclick="openViewer('${itemData.glb}', '${itemData.title}')">View 3D</a>`;
-    }
-
-    if (itemData.stl) {
-        buttonsHtml += `<a class="btn" href="${itemData.stl}" download>STL</a>`;
-    }
-
-    if (itemData.obj) {
-        buttonsHtml += `<a class="btn" href="${itemData.obj}" download>OBJ</a>`;
-    }
-
-    if (itemData.fbx) {
-        buttonsHtml += `<a class="btn" href="${itemData.fbx}" download>FBX</a>`;
-    }
-
-    item.innerHTML = `
-        <div class="item-glitch"></div>
-        <div class="item-inner">
-            <div class="item-title">${itemData.title}</div>
-            <img src="${itemData.png || 'placeholder.png'}" alt="${itemData.title}">
-            <div class="item-buttons">
-                ${buttonsHtml || '<span style="color: var(--neon-yellow); font-size: 0.7rem;">No files</span>'}
-            </div>
-            <div class="item-actions">
-                <button class="edit-btn" onclick="openEditModal(${index})">Edit</button>
-                <button class="delete-btn" onclick="deleteGalleryItem(${index})">Delete</button>
-            </div>
-        </div>
-    `;
-
+function addItem(itemData) {
+    const gallery = document.getElementById('gallery');
+    const item = createItemCard(itemData);
     gallery.appendChild(item);
 }
 
-function deleteGalleryItem(index) {
-    galleryItems.splice(index, 1);
-    localStorage.setItem('lowdangles_items', JSON.stringify(galleryItems));
-    rebuildFileList();
-    displayGalleryItems();
+function createItemCard(data) {
+    const itemDiv = document.createElement('div');
+    itemDiv.className = 'item';
+    itemDiv.setAttribute('data-name', data.title);
+    itemDiv.setAttribute('data-category', 'all');
+
+    // Add glitch overlay
+    const glitchDiv = document.createElement('div');
+    glitchDiv.className = 'item-glitch';
+    itemDiv.appendChild(glitchDiv);
+
+    // Create inner container
+    const innerDiv = document.createElement('div');
+    innerDiv.className = 'item-inner';
+
+    // Title
+    const titleDiv = document.createElement('div');
+    titleDiv.className = 'item-title';
+    titleDiv.textContent = data.title;
+    innerDiv.appendChild(titleDiv);
+
+    // Thumbnail
+    if (data.thumbnail) {
+        const img = document.createElement('img');
+        img.src = data.thumbnail;
+        img.alt = data.title;
+        innerDiv.appendChild(img);
+    }
+
+    // Model buttons
+    const buttonsDiv = document.createElement('div');
+    buttonsDiv.className = 'item-buttons';
+
+    for (const [format, modelData] of Object.entries(data.models)) {
+        if (modelData) {
+            const link = document.createElement('a');
+            link.href = '#';
+            link.className = 'btn';
+            link.textContent = format.toUpperCase();
+            link.onclick = (e) => {
+                e.preventDefault();
+                openViewer(modelData.data, data.title);
+            };
+            buttonsDiv.appendChild(link);
+        }
+    }
+
+    innerDiv.appendChild(buttonsDiv);
+
+    // Actions
+    const actionsDiv = document.createElement('div');
+    actionsDiv.className = 'item-actions';
+
+    const editBtn = document.createElement('button');
+    editBtn.className = 'edit-btn';
+    editBtn.textContent = 'Edit';
+    editBtn.onclick = () => openEditModal(itemDiv);
+    actionsDiv.appendChild(editBtn);
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'delete-btn';
+    deleteBtn.textContent = 'Delete';
+    deleteBtn.onclick = () => itemDiv.remove();
+    actionsDiv.appendChild(deleteBtn);
+
+    innerDiv.appendChild(actionsDiv);
+    itemDiv.appendChild(innerDiv);
+
+    return itemDiv;
 }
-    
-// Initial load - rebuild file list FIRST, then display items
-rebuildFileList();
-displayGalleryItems();
 
-/* ===== EDIT MODAL ===== */
-function openEditModal(index) {
-    currentEditingIndex = index;
-    const item = galleryItems[index];
+function openEditModal(itemElement) {
+    currentEditingIndex = Array.from(document.getElementById('gallery').children).indexOf(itemElement);
+    const title = itemElement.getAttribute('data-name');
+    document.getElementById('editTitle').value = title;
 
-    document.getElementById('editTitle').value = item.title;
-    // Populate selectors with all files
-    populateFileSelectors(item);
+    // Update file selectors with available files
+    const pngSelector = document.getElementById('pngSelector');
+    const glbSelector = document.getElementById('glbSelector');
+    const objSelector = document.getElementById('objSelector');
+    const fbxSelector = document.getElementById('fbxSelector');
+    const stlSelector = document.getElementById('stlSelector');
+
+    // Clear previous options
+    [pngSelector, glbSelector, objSelector, fbxSelector, stlSelector].forEach(sel => {
+        while (sel.children.length > 1) sel.removeChild(sel.lastChild);
+    });
+
+    // Add uploaded files to selectors
+    allUploadedFiles.forEach((file, index) => {
+        const ext = file.name.split('.').pop().toLowerCase();
+        const option = document.createElement('option');
+        option.value = index;
+        option.textContent = file.name;
+
+        if (ext === 'png') pngSelector.appendChild(option);
+        else if (ext === 'glb') glbSelector.appendChild(option);
+        else if (ext === 'obj') objSelector.appendChild(option);
+        else if (ext === 'fbx') fbxSelector.appendChild(option);
+        else if (ext === 'stl') stlSelector.appendChild(option);
+    });
 
     document.getElementById('editModal').classList.add('active');
 }
@@ -1144,123 +1182,87 @@ function closeEditModal() {
     currentEditingIndex = -1;
 }
 
-function populateFileSelectors(currentItem) {
-    const types = ['png', 'glb', 'obj', 'fbx', 'stl'];
-    
-    types.forEach(type => {
-        const selector = document.getElementById(type + 'Selector');
-        selector.innerHTML = '<option value="">-- Select ' + type.toUpperCase() + ' --</option>';
-        
-        allUploadedFiles.forEach((file, idx) => {
-            const option = document.createElement('option');
-            option.value = idx;
-            option.textContent = file.name;
-            if (currentItem[type] === file.dataUrl) {
-                option.selected = true;
-            }
-            selector.appendChild(option);
-        });
-    });
-}
-
-function addFileToItem(type) {
-    const selector = document.getElementById(type + 'Selector');
-    const selectedIdx = selector.value;
-
-    if (selectedIdx === '') return;
-
-    const file = allUploadedFiles[selectedIdx];
-    galleryItems[currentEditingIndex][type] = file.dataUrl;
-
-    populateFileSelectors(galleryItems[currentEditingIndex]);
+function addFileToItem(fileType) {
+    // Placeholder for adding files to the item
+    console.log('Add ' + fileType + ' file');
 }
 
 function saveEditedItem() {
-    galleryItems[currentEditingIndex].title = document.getElementById('editTitle').value;
-    localStorage.setItem('lowdangles_items', JSON.stringify(galleryItems));
-
+    const title = document.getElementById('editTitle').value;
+    const items = document.getElementById('gallery').children;
+    if (currentEditingIndex >= 0 && currentEditingIndex < items.length) {
+        const titleElement = items[currentEditingIndex].querySelector('.item-title');
+        if (titleElement) {
+            titleElement.textContent = title;
+        }
+        items[currentEditingIndex].setAttribute('data-name', title);
+    }
     closeEditModal();
-    rebuildFileList();
-    displayGalleryItems();
 }
 
-/* ===== DROP ZONE FUNCTIONALITY ===== */
-const dropzone = document.getElementById("dropzone");
-
-dropzone.addEventListener("dragover", e => {
-    e.preventDefault();
-    dropzone.classList.add("dragover");
+// Submission handler for suggestions
+document.getElementById('submit-suggestion').addEventListener('click', submitSuggestion);
+document.getElementById('suggestion-text').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') submitSuggestion();
 });
 
-dropzone.addEventListener("dragleave", () => {
-    dropzone.classList.remove("dragover");
-});
+function submitSuggestion() {
+    const input = document.getElementById('suggestion-text');
+    const text = input.value.trim();
 
-dropzone.addEventListener("drop", e => {
-    e.preventDefault();
-    dropzone.classList.remove("dragover");
+    if (!text) return;
 
-    const files = [...e.dataTransfer.files];
-    processFiles(files);
-});
+    // Load suggestions from localStorage
+    let suggestions = JSON.parse(localStorage.getItem('suggestions')) || [];
 
-function processFiles(files) {
-    const groups = {};
-
-    files.forEach(file => {
-        const name = file.name.toLowerCase();
-        const ext = name.split('.').pop();
-        const baseName = name.slice(0, -(ext.length + 1));
-
-        if (!groups[baseName]) groups[baseName] = [];
-        groups[baseName].push({ file, ext });
+    // Add new suggestion
+    suggestions.push({
+        text: text,
+        timestamp: new Date().toLocaleString()
     });
 
-    Object.keys(groups).forEach(baseName => {
-        addItemToGallery(baseName, groups[baseName]);
+    // Save to localStorage
+    localStorage.setItem('suggestions', JSON.stringify(suggestions));
+
+    // Update archive display
+    updateSuggestionsArchive();
+
+    // Clear input
+    input.value = '';
+}
+
+function updateSuggestionsArchive() {
+    const archive = document.getElementById('suggestions-archive');
+    const suggestions = JSON.parse(localStorage.getItem('suggestions')) || [];
+
+    archive.innerHTML = '';
+
+    if (suggestions.length === 0) {
+        archive.innerHTML = '<p style="text-align: center; color: var(--neon-yellow); font-size: 0.7rem;">No suggestions yet.</p>';
+        return;
+    }
+
+    suggestions.reverse().forEach(suggestion => {
+        const item = document.createElement('div');
+        item.className = 'suggestion-item';
+
+        const text = document.createElement('div');
+        text.className = 'suggestion-text';
+        text.textContent = suggestion.text;
+
+        const meta = document.createElement('div');
+        meta.className = 'suggestion-meta';
+        meta.textContent = suggestion.timestamp;
+
+        item.appendChild(text);
+        item.appendChild(meta);
+        archive.appendChild(item);
     });
 }
 
-function addItemToGallery(baseName, fileData) {
-    const pngFile = fileData.find(f => f.ext === 'png')?.file;
-    const glbFile = fileData.find(f => f.ext === 'glb')?.file;
-    const objFile = fileData.find(f => f.ext === 'obj')?.file;
-    const fbxFile = fileData.find(f => f.ext === 'fbx')?.file;
-    const stlFile = fileData.find(f => f.ext === 'stl')?.file;
+// Load suggestions on page load
+window.addEventListener('load', updateSuggestionsArchive);
 
-    const title = baseName || ("untitled" + String(Date.now()).slice(-4));
-
-    const filePromises = [];
-
-    if (pngFile) filePromises.push(fileToBase64(pngFile).then(data => ({ key: 'png', data, name: pngFile.name })));
-    if (glbFile) filePromises.push(fileToBase64(glbFile).then(data => ({ key: 'glb', data, name: glbFile.name })));
-    if (objFile) filePromises.push(fileToBase64(objFile).then(data => ({ key: 'obj', data, name: objFile.name })));
-    if (fbxFile) filePromises.push(fileToBase64(fbxFile).then(data => ({ key: 'fbx', data, name: fbxFile.name })));
-    if (stlFile) filePromises.push(fileToBase64(stlFile).then(data => ({ key: 'stl', data, name: stlFile.name })));
-
-    Promise.all(filePromises).then(results => {
-        const itemData = { title };
-
-        results.forEach(({ key, data }) => {
-            itemData[key] = data;
-        });
-
-        galleryItems.push(itemData);
-        localStorage.setItem('lowdangles_items', JSON.stringify(galleryItems));
-        
-        rebuildFileList();
-        displayGalleryItems();
-    });
-}
-
-function fileToBase64(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-    });
-}
 </script>
 
 </body>
