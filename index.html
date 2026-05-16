@@ -956,7 +956,7 @@ function scrollToSection(id) {
     });
 }
 
-    /* Toggle suggestions box */
+/* Toggle suggestions box */
 function toggleSuggestions() {
     const content = document.getElementById('suggestions-content');
     const floating = document.getElementById('suggestions-floating');
@@ -966,6 +966,7 @@ function toggleSuggestions() {
     floating.classList.toggle('collapsed');
     icon.textContent = content.classList.contains('hidden') ? '▶' : '▼';
 }
+
 /* Open 3D Viewer */
 function openViewer(modelPath, title) {
     const mv = document.getElementById('mv');
@@ -979,10 +980,12 @@ function openViewer(modelPath, title) {
 
     scrollToSection('viewer-section');
 }
+
 /* Close 3D Viewer */
 function closeViewer() {
     document.getElementById('viewer').classList.remove('active');
 }
+
 /* SEARCH + CATEGORY FILTER */
 document.getElementById('search').addEventListener('input', filterItems);
 document.getElementById('category').addEventListener('change', filterItems);
@@ -1027,23 +1030,43 @@ dropzone.addEventListener('drop', (e) => {
     processDroppedFiles(files);
 });
 
+function getBaseName(filename) {
+    // Extract base name by removing extension and trailing numbers
+    // e.g., "martini_glass001.obj" -> "martini_glass"
+    const nameWithoutExt = filename.substring(0, filename.lastIndexOf('.'));
+    // Remove trailing numbers (like 001, 002)
+    return nameWithoutExt.replace(/\d+$/, '');
+}
+
 function processDroppedFiles(files) {
-    let itemData = {
-        title: 'New Item',
-        thumbnail: null,
-        models: {
-            glb: null,
-            obj: null,
-            fbx: null,
-            stl: null
-        }
-    };
+    // Group files by base name
+    const groupedFiles = {};
+    const fileArray = Array.from(files);
 
-    for (let file of files) {
+    // First pass: read all files and group them
+    for (let i = 0; i < fileArray.length; i++) {
+        const file = fileArray[i];
         const ext = file.name.split('.').pop().toLowerCase();
+        const baseName = getBaseName(file.name);
+        
         const reader = new FileReader();
-
         reader.onload = (e) => {
+            if (!groupedFiles[baseName]) {
+                groupedFiles[baseName] = {
+                    title: baseName,
+                    thumbnail: null,
+                    models: {
+                        glb: null,
+                        obj: null,
+                        fbx: null,
+                        stl: null
+                    },
+                    fileCount: 0,
+                    totalFiles: fileArray.filter(f => getBaseName(f.name) === baseName).length
+                };
+            }
+
+            const itemData = groupedFiles[baseName];
             const dataUrl = e.target.result;
 
             if (ext === 'png') {
@@ -1055,9 +1078,10 @@ function processDroppedFiles(files) {
                 };
             }
 
-            // Check if all files for this item have been processed
-            const allFilesProcessed = files.length === Object.keys(itemData.models).filter(k => itemData.models[k] !== null).length + (itemData.thumbnail ? 1 : 0);
-            if (allFilesProcessed) {
+            itemData.fileCount++;
+
+            // Check if all files for this group have been processed
+            if (itemData.fileCount === itemData.totalFiles) {
                 addItem(itemData);
             }
         };
@@ -1068,8 +1092,67 @@ function processDroppedFiles(files) {
 
 function addItem(itemData) {
     const gallery = document.getElementById('gallery');
-    const item = createItemCard(itemData);
-    gallery.appendChild(item);
+    
+    // Check if item with same base name already exists
+    const existingItem = Array.from(gallery.children).find(
+        item => item.getAttribute('data-name') === itemData.title
+    );
+
+    if (existingItem) {
+        // Update existing item with new files
+        updateItemWithNewFiles(existingItem, itemData);
+    } else {
+        // Create new card
+        const item = createItemCard(itemData);
+        gallery.appendChild(item);
+    }
+}
+
+function updateItemWithNewFiles(existingItem, newData) {
+    // Update thumbnail if new one provided
+    if (newData.thumbnail) {
+        const img = existingItem.querySelector('.item img');
+        if (img) {
+            img.src = newData.thumbnail;
+        } else {
+            const innerDiv = existingItem.querySelector('.item-inner');
+            const img = document.createElement('img');
+            img.src = newData.thumbnail;
+            img.alt = newData.title;
+            innerDiv.insertBefore(img, innerDiv.querySelector('.item-buttons'));
+        }
+    }
+
+    // Update model buttons
+    const buttonsDiv = existingItem.querySelector('.item-buttons');
+    
+    for (const [format, modelData] of Object.entries(newData.models)) {
+        if (modelData) {
+            // Check if button for this format already exists
+            const existingBtn = Array.from(buttonsDiv.children).find(
+                btn => btn.textContent === format.toUpperCase()
+            );
+
+            if (existingBtn) {
+                // Update existing button
+                existingBtn.onclick = (e) => {
+                    e.preventDefault();
+                    openViewer(modelData.data, newData.title);
+                };
+            } else {
+                // Create new button
+                const link = document.createElement('a');
+                link.href = '#';
+                link.className = 'btn';
+                link.textContent = format.toUpperCase();
+                link.onclick = (e) => {
+                    e.preventDefault();
+                    openViewer(modelData.data, newData.title);
+                };
+                buttonsDiv.appendChild(link);
+            }
+        }
+    }
 }
 
 function createItemCard(data) {
@@ -1183,7 +1266,6 @@ function closeEditModal() {
 }
 
 function addFileToItem(fileType) {
-    // Placeholder for adding files to the item
     console.log('Add ' + fileType + ' file');
 }
 
