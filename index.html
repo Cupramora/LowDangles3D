@@ -15,9 +15,7 @@
             --bg-deep: #050308;
         }
 
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
 
         body {
             margin: 0;
@@ -26,8 +24,6 @@
             font-family: 'Segoe UI', system-ui, sans-serif;
             overflow-x: hidden;
         }
-
-        /* ===== BACKGROUND: PICASSO CYBER CITY + VOID DISTORTIONS ===== */
 
         body::before {
             content: "";
@@ -43,853 +39,305 @@
             z-index: -3;
         }
 
-        /* Abstract city blocks */
-        .city-layer {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: -2;
-            opacity: 0.35;
-        }
-
+        .city-layer { position: fixed; inset: 0; pointer-events: none; z-index: -2; opacity: 0.35; }
         .city-block {
             position: absolute;
-            background: linear-gradient(
-                to top,
-                rgba(0, 0, 0, 0.9),
-                rgba(0, 246, 255, 0.2)
-            );
+            background: linear-gradient(to top, rgba(0,0,0,.9), rgba(0,246,255,.2));
             border-radius: 4px;
-            box-shadow:
-                0 0 10px rgba(0, 246, 255, 0.4),
-                0 0 25px rgba(255, 0, 255, 0.3);
+            box-shadow: 0 0 10px rgba(0,246,255,.4), 0 0 25px rgba(255,0,255,.3);
             transform-origin: bottom;
             animation: city-float 12s ease-in-out infinite alternate;
         }
-
         @keyframes city-float {
             0% { transform: translateY(0) skewX(-6deg); }
             100% { transform: translateY(-10px) skewX(-3deg); }
         }
 
-        /* Scanline + glitch overlay */
         .scanlines {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            background-image: linear-gradient(
-                to bottom,
-                rgba(255, 255, 255, 0.04) 1px,
-                transparent 1px
-            );
+            position: fixed; inset: 0; pointer-events: none;
+            background-image: linear-gradient(to bottom, rgba(255,255,255,.04) 1px, transparent 1px);
             background-size: 100% 2px;
-            mix-blend-mode: soft-light;
-            opacity: 0.25;
-            z-index: -1;
+            mix-blend-mode: soft-light; opacity: 0.25; z-index: -1;
             animation: scan-flicker 3s linear infinite;
         }
-
-        @keyframes scan-flicker {
-            0%, 100% { opacity: 0.25; }
-            50% { opacity: 0.35; }
-        }
+        @keyframes scan-flicker { 0%,100% { opacity:.25 } 50% { opacity:.35 } }
 
         .glitch-noise {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            background-image: repeating-linear-gradient(
-                45deg,
-                rgba(255, 255, 255, 0.03) 0,
-                rgba(255, 255, 255, 0.03) 2px,
-                transparent 2px,
-                transparent 4px
-            );
-            mix-blend-mode: overlay;
-            opacity: 0.18;
-            z-index: -1;
+            position: fixed; inset: 0; pointer-events: none;
+            background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.03) 0, rgba(255,255,255,.03) 2px, transparent 2px, transparent 4px);
+            mix-blend-mode: overlay; opacity: .18; z-index: -1;
         }
 
-        /* ===== MODAL STYLES ===== */
-
-        .modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 100;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
+        /* ===== MODAL ===== */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.8); z-index: 100; align-items: center; justify-content: center; }
+        .modal.active { display: flex; }
         .modal-content {
-            background: radial-gradient(circle at top,
-                rgba(0, 246, 255, 0.15),
-                #020208 60%
-            );
+            background: radial-gradient(circle at top, rgba(0,246,255,.15), #020208 60%);
             border: 2px solid var(--neon-cyan);
             border-radius: 16px;
             padding: 30px;
             max-width: 600px;
-            max-height: 80vh;
+            width: 92%;
+            max-height: 85vh;
             overflow-y: auto;
-            box-shadow: 0 0 40px rgba(0, 246, 255, 0.6);
+            box-shadow: 0 0 40px rgba(0,246,255,.6);
         }
-
-        .modal-title {
-            color: var(--neon-cyan);
-            text-shadow: 0 0 10px var(--neon-cyan);
-            margin-bottom: 20px;
-        }
-
-        .modal-group {
-            margin-bottom: 15px;
-        }
-
-        .modal-label {
-            color: var(--neon-yellow);
-            font-size: 0.9rem;
-            margin-bottom: 5px;
-            display: block;
-        }
-
+        .modal-title { color: var(--neon-cyan); text-shadow: 0 0 10px var(--neon-cyan); margin-bottom: 20px; }
+        .modal-group { margin-bottom: 15px; }
+        .modal-label { color: var(--neon-yellow); font-size: .9rem; margin-bottom: 5px; display: block; }
         .modal-input {
-            width: 100%;
-            padding: 10px;
-            border-radius: 6px;
+            width: 100%; padding: 10px; border-radius: 6px;
             border: 1px solid var(--neon-cyan);
-            background: rgba(0, 20, 30, 0.9);
-            color: var(--neon-cyan);
-            box-sizing: border-box;
-            outline: none;
+            background: rgba(0,20,30,.9); color: var(--neon-cyan);
+            box-sizing: border-box; outline: none;
         }
+        .modal-input:focus { box-shadow: 0 0 15px rgba(0,246,255,.4) inset; }
 
-        .modal-input:focus {
-            box-shadow: 0 0 15px rgba(0, 246, 255, 0.4) inset;
-        }
+        .modal-buttons { display: flex; gap: 10px; margin-top: 20px; }
+        .modal-btn { flex: 1; padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; box-shadow: 0 0 10px; transition: all .2s; }
+        .modal-btn.save { background: var(--neon-cyan); color: #000; box-shadow: 0 0 15px var(--neon-cyan); }
+        .modal-btn.save:hover { transform: translateY(-2px); box-shadow: 0 0 25px var(--neon-cyan); }
+        .modal-btn.close { background: #111; color: var(--neon-cyan); box-shadow: 0 0 10px rgba(0,246,255,.6); }
+        .modal-btn.close:hover { transform: translateY(-2px); }
 
-        .file-selector {
-            display: flex;
-            gap: 5px;
-            margin-bottom: 10px;
-        }
-
-        .file-selector select {
-            flex: 1;
-            padding: 8px;
-            border-radius: 4px;
-            border: 1px solid var(--neon-cyan);
-            background: rgba(0, 20, 30, 0.9);
-            color: var(--neon-cyan);
-            outline: none;
-        }
-
-        .file-selector button {
-            padding: 8px 12px;
-            background: var(--neon-magenta);
-            color: #000;
-            border: none;
-            border-radius: 4px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 0 10px var(--neon-magenta);
-        }
-
-        .file-selector button:hover {
-            transform: translateY(-1px);
-        }
-
-        .modal-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .modal-btn {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 0 10px;
-            transition: all 0.2s;
-        }
-
-        .modal-btn.save {
-            background: var(--neon-cyan);
-            color: #000;
-            box-shadow: 0 0 15px var(--neon-cyan);
-        }
-
-        .modal-btn.save:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0 25px var(--neon-cyan);
-        }
-
-        .modal-btn.close {
-            background: #111;
-            color: var(--neon-cyan);
-            box-shadow: 0 0 10px rgba(0, 246, 255, 0.6);
-        }
-
-        .modal-btn.close:hover {
-            transform: translateY(-2px);
-        }
-
-        /* ===== SUBTLE SUGGESTIONS BOX (TOP LEFT) ===== */
-
-        .suggestions-floating {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            background: rgba(5, 5, 20, 0.7);
+        /* Add-files drop area inside edit modal */
+        #editAddDrop {
+            margin-top: 8px;
+            padding: 14px;
+            border: 2px dashed var(--neon-magenta);
             border-radius: 8px;
-            padding: 12px;
-            box-shadow: 0 0 10px rgba(0, 246, 255, 0.2);
-            backdrop-filter: blur(8px);
-            z-index: 9;
-            max-width: 280px;
-            border: 1px solid rgba(0, 246, 255, 0.15);
-        }
-
-        .suggestions-floating.collapsed {
-            padding: 8px 12px;
-        }
-
-        .suggestions-toggle {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            cursor: pointer;
-            margin-bottom: 8px;
-        }
-
-        .suggestions-toggle.collapsed {
-            margin-bottom: 0;
-        }
-
-        .suggestions-label {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--neon-yellow);
-        }
-
-        .suggestions-expand {
-            font-size: 0.8rem;
-            color: var(--neon-cyan);
-        }
-
-        .suggestions-content {
-            display: block;
-        }
-
-        .suggestions-content.hidden {
-            display: none;
-        }
-
-        .suggestion-input-group {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 8px;
-        }
-
-        #suggestion-text {
-            flex: 1;
-            padding: 6px;
-            border-radius: 4px;
-            border: 1px solid var(--neon-cyan);
-            background: rgba(0, 20, 30, 0.8);
-            color: var(--neon-cyan);
-            font-size: 0.8rem;
-            box-shadow: 0 0 8px rgba(0, 246, 255, 0.15) inset;
-            outline: none;
-        }
-
-        #suggestion-text:focus {
-            box-shadow: 0 0 12px rgba(0, 246, 255, 0.3) inset;
-        }
-
-        #submit-suggestion {
-            padding: 6px 10px;
-            border-radius: 4px;
-            border: none;
-            background: var(--neon-magenta);
-            color: #000;
-            font-weight: bold;
-            font-size: 0.75rem;
-            cursor: pointer;
-            box-shadow: 0 0 10px var(--neon-magenta);
-            transition: all 0.2s;
-        }
-
-        #submit-suggestion:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 0 15px var(--neon-magenta);
-        }
-
-        .suggestions-archive {
-            max-height: 150px;
-            overflow-y: auto;
-            border: 1px solid rgba(0, 246, 255, 0.15);
-            border-radius: 4px;
-            padding: 6px;
-            background: rgba(0, 0, 0, 0.5);
-            font-size: 0.75rem;
-        }
-
-        .suggestion-item {
-            padding: 4px;
-            margin-bottom: 4px;
-            border-left: 1px solid var(--neon-cyan);
-            background: rgba(0, 246, 255, 0.03);
-            border-radius: 2px;
-            line-height: 1.3;
-        }
-
-        .suggestion-text {
-            color: var(--neon-cyan);
-            margin-bottom: 2px;
-        }
-
-        .suggestion-meta {
-            font-size: 0.65rem;
-            color: var(--neon-yellow);
-            opacity: 0.7;
-        }
-
-        /* ===== HEADER / TITLE ===== */
-
-        header {
             text-align: center;
-            padding: 40px 20px 20px;
+            color: var(--neon-magenta);
+            background: rgba(255,0,255,.05);
+            cursor: pointer;
+            font-size: .85rem;
+            transition: background .15s, box-shadow .15s;
+        }
+        #editAddDrop.dragover {
+            background: rgba(255,0,255,.18);
+            box-shadow: 0 0 18px rgba(255,0,255,.5);
         }
 
-        h1 {
-            margin-bottom: 10px;
-            font-size: 3rem;
-            color: var(--neon-cyan);
-            text-shadow:
-                0 0 10px var(--neon-cyan),
-                0 0 25px var(--neon-magenta);
+        /* ===== SUGGESTIONS BOX ===== */
+        .suggestions-floating {
+            position: fixed; top: 20px; left: 20px;
+            background: rgba(5,5,20,.7);
+            border-radius: 8px; padding: 12px;
+            box-shadow: 0 0 10px rgba(0,246,255,.2);
+            backdrop-filter: blur(8px);
+            z-index: 9; max-width: 280px;
+            border: 1px solid rgba(0,246,255,.15);
         }
-
-        .subtitle {
-            max-width: 600px;
-            margin: 0 auto;
-            opacity: 0.85;
+        .suggestions-floating.collapsed { padding: 8px 12px; }
+        .suggestions-toggle { display: flex; align-items: center; justify-content: space-between; cursor: pointer; margin-bottom: 8px; }
+        .suggestions-toggle.collapsed { margin-bottom: 0; }
+        .suggestions-label { font-size: .7rem; text-transform: uppercase; letter-spacing: .1em; color: var(--neon-yellow); }
+        .suggestions-expand { font-size: .8rem; color: var(--neon-cyan); }
+        .suggestions-content { display: block; }
+        .suggestions-content.hidden { display: none; }
+        .suggestion-input-group { display: flex; gap: 6px; margin-bottom: 8px; }
+        #suggestion-text {
+            flex: 1; padding: 6px; border-radius: 4px;
+            border: 1px solid var(--neon-cyan);
+            background: rgba(0,20,30,.8); color: var(--neon-cyan);
+            font-size: .8rem; box-shadow: 0 0 8px rgba(0,246,255,.15) inset; outline: none;
         }
+        #submit-suggestion {
+            padding: 6px 10px; border-radius: 4px; border: none;
+            background: var(--neon-magenta); color: #000; font-weight: bold;
+            font-size: .75rem; cursor: pointer;
+            box-shadow: 0 0 10px var(--neon-magenta); transition: all .2s;
+        }
+        #submit-suggestion:hover { transform: translateY(-1px); box-shadow: 0 0 15px var(--neon-magenta); }
+        .suggestions-archive {
+            max-height: 150px; overflow-y: auto;
+            border: 1px solid rgba(0,246,255,.15);
+            border-radius: 4px; padding: 6px;
+            background: rgba(0,0,0,.5); font-size: .75rem;
+        }
+        .suggestion-item { padding: 4px; margin-bottom: 4px; border-left: 1px solid var(--neon-cyan); background: rgba(0,246,255,.03); border-radius: 2px; line-height: 1.3; }
+        .suggestion-text { color: var(--neon-cyan); margin-bottom: 2px; }
+        .suggestion-meta { font-size: .65rem; color: var(--neon-yellow); opacity: .7; }
 
-        /* ===== NEON MINIMAP NAV BAR ===== */
+        /* ===== HEADER ===== */
+        header { text-align: center; padding: 40px 20px 20px; }
+        h1 { margin-bottom: 10px; font-size: 3rem; color: var(--neon-cyan); text-shadow: 0 0 10px var(--neon-cyan), 0 0 25px var(--neon-magenta); }
+        .subtitle { max-width: 600px; margin: 0 auto; opacity: .85; }
 
+        /* ===== MINIMAP ===== */
         .minimap-nav {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(5, 5, 20, 0.85);
-            border-radius: 12px;
-            padding: 10px 14px;
-            box-shadow:
-                0 0 15px rgba(0, 246, 255, 0.5),
-                0 0 30px rgba(255, 0, 255, 0.3);
-            backdrop-filter: blur(10px);
-            z-index: 10;
+            position: fixed; top: 20px; right: 20px;
+            background: rgba(5,5,20,.85); border-radius: 12px; padding: 10px 14px;
+            box-shadow: 0 0 15px rgba(0,246,255,.5), 0 0 30px rgba(255,0,255,.3);
+            backdrop-filter: blur(10px); z-index: 10;
         }
-
-        .minimap-title {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.12em;
-            color: var(--neon-yellow);
-            margin-bottom: 6px;
-        }
-
-        .minimap-dots {
-            display: flex;
-            gap: 6px;
-        }
-
+        .minimap-title { font-size: .7rem; text-transform: uppercase; letter-spacing: .12em; color: var(--neon-yellow); margin-bottom: 6px; }
+        .minimap-dots { display: flex; gap: 6px; }
         .minimap-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
+            width: 10px; height: 10px; border-radius: 50%;
             border: 1px solid var(--neon-cyan);
             background: radial-gradient(circle, var(--neon-magenta) 0, transparent 60%);
-            cursor: pointer;
-            box-shadow: 0 0 8px var(--neon-cyan);
-            transition: transform 0.15s, box-shadow 0.15s;
+            cursor: pointer; box-shadow: 0 0 8px var(--neon-cyan);
+            transition: transform .15s, box-shadow .15s;
         }
+        .minimap-dot:hover { transform: scale(1.2); box-shadow: 0 0 14px var(--neon-yellow); }
 
-        .minimap-dot:hover {
-            transform: scale(1.2);
-            box-shadow: 0 0 14px var(--neon-yellow);
-        }
-
-        /* ===== SEARCH + CATEGORY ===== */
-
-        .search-row {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
+        /* ===== SEARCH ===== */
+        .search-row { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
         #search {
-            width: 50%;
-            max-width: 400px;
-            padding: 12px;
-            border-radius: 6px;
-            border: none;
-            font-size: 1rem;
-            background: rgba(10, 10, 25, 0.9);
-            color: var(--neon-cyan);
-            box-shadow: 0 0 10px var(--neon-cyan) inset;
-            outline: none;
+            width: 50%; max-width: 400px; padding: 12px; border-radius: 6px; border: none;
+            font-size: 1rem; background: rgba(10,10,25,.9); color: var(--neon-cyan);
+            box-shadow: 0 0 10px var(--neon-cyan) inset; outline: none;
         }
-
         #category {
-            padding: 12px;
-            border-radius: 6px;
-            background: rgba(10, 10, 25, 0.9);
-            color: var(--neon-magenta);
-            border: none;
-            box-shadow: 0 0 10px var(--neon-magenta) inset;
-            outline: none;
+            padding: 12px; border-radius: 6px; background: rgba(10,10,25,.9);
+            color: var(--neon-magenta); border: none;
+            box-shadow: 0 0 10px var(--neon-magenta) inset; outline: none;
         }
 
         /* ===== DROP ZONE ===== */
-
         #dropzone {
-            margin: 40px auto;
-            width: 80%;
-            padding: 40px;
-            border: 2px dashed #0ff;
-            border-radius: 12px;
-            text-align: center;
-            color: #0ff;
-            background: rgba(0, 255, 255, 0.05);
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+            margin: 40px auto; width: 80%; padding: 40px;
+            border: 2px dashed #0ff; border-radius: 12px;
+            text-align: center; color: #0ff;
+            background: rgba(0,255,255,.05); box-shadow: 0 0 20px rgba(0,255,255,.2);
         }
-
-        #dropzone.dragover {
-            background: rgba(0, 255, 255, 0.15);
-            box-shadow: 0 0 30px #0ff;
-        }
-
-        .dropzone-container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
+        #dropzone.dragover { background: rgba(0,255,255,.15); box-shadow: 0 0 30px #0ff; }
+        .dropzone-container { display: flex; flex-direction: column; gap: 20px; }
         #dropzone-files {
-            max-height: 200px;
-            overflow-y: auto;
-            border: 1px solid rgba(0, 246, 255, 0.3);
-            border-radius: 8px;
-            padding: 10px;
-            background: rgba(0, 246, 255, 0.05);
-            display: none;
+            max-height: 200px; overflow-y: auto;
+            border: 1px solid rgba(0,246,255,.3); border-radius: 8px;
+            padding: 10px; background: rgba(0,246,255,.05); display: none;
         }
-
-        #dropzone-files.active {
-            display: block;
-        }
-
+        #dropzone-files.active { display: block; }
         .dropzone-file-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px;
-            background: rgba(0, 246, 255, 0.1);
-            border-radius: 4px;
-            margin-bottom: 6px;
-            font-size: 0.85rem;
-            color: var(--neon-yellow);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 8px; background: rgba(0,246,255,.1); border-radius: 4px;
+            margin-bottom: 6px; font-size: .85rem; color: var(--neon-yellow);
         }
-
-        .dropzone-file-item .file-name {
-            flex: 1;
-        }
-
+        .dropzone-file-item .file-name { flex: 1; text-align: left; word-break: break-all; }
         .dropzone-file-item .file-remove {
-            background: rgba(255, 0, 0, 0.6);
-            color: #fff;
-            border: none;
-            padding: 3px 8px;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 0.7rem;
-            font-weight: bold;
+            background: rgba(255,0,0,.6); color: #fff; border: none;
+            padding: 3px 8px; border-radius: 3px; cursor: pointer;
+            font-size: .7rem; font-weight: bold;
         }
+        .dropzone-file-item .file-remove:hover { background: rgba(255,0,0,.9); }
 
-        .dropzone-file-item .file-remove:hover {
-            background: rgba(255, 0, 0, 0.9);
-        }
-
-        .dropzone-actions {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            display: none;
-        }
-
-        .dropzone-actions.active {
-            display: flex;
-        }
-
+        .dropzone-actions { display: none; gap: 10px; justify-content: center; }
+        .dropzone-actions.active { display: flex; }
         .dropzone-actions button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 0 10px;
-            transition: all 0.2s;
-            font-size: 0.85rem;
+            padding: 10px 20px; border: none; border-radius: 6px;
+            font-weight: bold; cursor: pointer; box-shadow: 0 0 10px;
+            transition: all .2s; font-size: .85rem;
         }
+        .dropzone-actions .submit-btn { background: var(--neon-cyan); color: #000; box-shadow: 0 0 15px var(--neon-cyan); flex: 1; }
+        .dropzone-actions .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 0 25px var(--neon-cyan); }
+        .dropzone-actions .clear-btn { background: #111; color: var(--neon-magenta); box-shadow: 0 0 10px rgba(255,0,255,.6); flex: 1; }
+        .dropzone-actions .clear-btn:hover { transform: translateY(-2px); }
 
-        .dropzone-actions .submit-btn {
-            background: var(--neon-cyan);
-            color: #000;
-            box-shadow: 0 0 15px var(--neon-cyan);
-            flex: 1;
-        }
-
-        .dropzone-actions .submit-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0 25px var(--neon-cyan);
-        }
-
-        .dropzone-actions .clear-btn {
-            background: #111;
-            color: var(--neon-magenta);
-            box-shadow: 0 0 10px rgba(255, 0, 255, 0.6);
-            flex: 1;
-        }
-
-        .dropzone-actions .clear-btn:hover {
-            transform: translateY(-2px);
-        }
-
-        /* ===== GALLERY / MATRIX GRID (8 COLUMNS) ===== */
-
-        .gallery-section {
-            padding: 20px 20px 40px;
-        }
-
-        .gallery {
-            display: grid;
-            grid-template-columns: repeat(8, 1fr);
-            gap: 15px;
-            padding: 20px 0 40px;
-        }
-
+        /* ===== GALLERY ===== */
+        .gallery-section { padding: 20px 20px 40px; }
+        .gallery { display: grid; grid-template-columns: repeat(8, 1fr); gap: 15px; padding: 20px 0 40px; }
         .item {
             position: relative;
-            background: radial-gradient(circle at top left,
-                rgba(0, 246, 255, 0.25),
-                rgba(5, 5, 20, 0.95)
-            );
-            padding: 12px;
-            border-radius: 12px;
-            text-align: center;
-            box-shadow:
-                0 0 15px rgba(0, 246, 255, 0.3),
-                0 0 30px rgba(255, 0, 255, 0.2);
-            backdrop-filter: blur(12px);
-            overflow: hidden;
-            transform: translateY(0);
-            transition: transform 0.2s, box-shadow 0.2s;
-            aspect-ratio: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+            background: radial-gradient(circle at top left, rgba(0,246,255,.25), rgba(5,5,20,.95));
+            padding: 12px; border-radius: 12px; text-align: center;
+            box-shadow: 0 0 15px rgba(0,246,255,.3), 0 0 30px rgba(255,0,255,.2);
+            backdrop-filter: blur(12px); overflow: hidden;
+            transform: translateY(0); transition: transform .2s, box-shadow .2s;
+            aspect-ratio: 1; display: flex; flex-direction: column; justify-content: space-between;
         }
-
         .item::before {
-            content: "";
-            position: absolute;
-            inset: -40%;
-            background: conic-gradient(
-                from 120deg,
-                rgba(0, 246, 255, 0.15),
-                rgba(255, 0, 255, 0.15),
-                rgba(255, 224, 102, 0.15),
-                rgba(0, 246, 255, 0.15)
-            );
-            mix-blend-mode: screen;
-            opacity: 0.25;
-            animation: holo-spin 18s linear infinite;
+            content: ""; position: absolute; inset: -40%;
+            background: conic-gradient(from 120deg, rgba(0,246,255,.15), rgba(255,0,255,.15), rgba(255,224,102,.15), rgba(0,246,255,.15));
+            mix-blend-mode: screen; opacity: .25; animation: holo-spin 18s linear infinite;
         }
+        @keyframes holo-spin { to { transform: rotate(360deg); } }
+        .item:hover { transform: translateY(-3px); box-shadow: 0 0 25px rgba(0,246,255,.6), 0 0 50px rgba(255,0,255,.4); }
+        .item-inner { position: relative; z-index: 1; display: flex; flex-direction: column; height: 100%; }
+        .item-title { font-weight: 600; margin-bottom: 6px; color: var(--neon-yellow); text-shadow: 0 0 8px var(--neon-yellow); font-size: .85rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .item img { width: 100%; height: 60px; object-fit: cover; border-radius: 6px; box-shadow: 0 0 10px rgba(0,246,255,.6); margin-bottom: 6px; flex-grow: 1; }
+        .item-buttons { display: flex; flex-direction: column; gap: 4px; max-height: 80px; overflow-y: auto; }
+        .item a { color: #000; text-decoration: none; display: block; font-size: .7rem; padding: 3px; }
+        .item-actions { margin-top: 4px; padding-top: 4px; border-top: 1px solid rgba(0,246,255,.2); display: flex; gap: 3px; }
+        .item-actions button { flex: 1; padding: 2px; border: none; border-radius: 3px; font-size: .65rem; cursor: pointer; transition: all .2s; }
+        .edit-btn { background: rgba(0,246,255,.6); color: #000; font-weight: bold; }
+        .edit-btn:hover { background: rgba(0,246,255,.9); }
+        .delete-btn { background: rgba(255,0,0,.6); color: #fff; font-weight: bold; }
+        .delete-btn:hover { background: rgba(255,0,0,.9); }
 
-        @keyframes holo-spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .item:hover {
-            transform: translateY(-3px);
-            box-shadow:
-                0 0 25px rgba(0, 246, 255, 0.6),
-                0 0 50px rgba(255, 0, 255, 0.4);
-        }
-
-        .item-inner {
-            position: relative;
-            z-index: 1;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
-
-        .item-title {
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: var(--neon-yellow);
-            text-shadow: 0 0 8px var(--neon-yellow);
-            font-size: 0.85rem;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .item img {
-            width: 100%;
-            height: 60px;
-            object-fit: cover;
-            border-radius: 6px;
-            box-shadow: 0 0 10px rgba(0, 246, 255, 0.6);
-            margin-bottom: 6px;
-            flex-grow: 1;
-        }
-
-        .item-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .item a {
-            color: #000;
-            text-decoration: none;
-            display: block;
-            font-size: 0.7rem;
-            padding: 3px;
-        }
-
-        .item-actions {
-            margin-top: 4px;
-            padding-top: 4px;
-            border-top: 1px solid rgba(0, 246, 255, 0.2);
-            display: flex;
-            gap: 3px;
-        }
-
-        .item-actions button {
-            flex: 1;
-            padding: 2px;
-            border: none;
-            border-radius: 3px;
-            font-size: 0.65rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .edit-btn {
-            background: rgba(0, 246, 255, 0.6);
-            color: #000;
-            font-weight: bold;
-        }
-
-        .edit-btn:hover {
-            background: rgba(0, 246, 255, 0.9);
-        }
-
-        .delete-btn {
-            background: rgba(255, 0, 0, 0.6);
-            color: #fff;
-            font-weight: bold;
-        }
-
-        .delete-btn:hover {
-            background: rgba(255, 0, 0, 0.9);
-        }
-
-        /* Glitch flicker on cards */
         .item-glitch {
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            background: repeating-linear-gradient(
-                90deg,
-                rgba(255, 255, 255, 0.08) 0,
-                rgba(255, 255, 255, 0.08) 1px,
-                transparent 1px,
-                transparent 3px
-            );
-            mix-blend-mode: soft-light;
-            opacity: 0;
-            animation: card-glitch 4s infinite;
-            z-index: 0;
+            position: absolute; inset: 0; pointer-events: none;
+            background: repeating-linear-gradient(90deg, rgba(255,255,255,.08) 0, rgba(255,255,255,.08) 1px, transparent 1px, transparent 3px);
+            mix-blend-mode: soft-light; opacity: 0;
+            animation: card-glitch 4s infinite; z-index: 0;
         }
-
         @keyframes card-glitch {
-            0%, 90%, 100% { opacity: 0; transform: translate(0, 0); }
-            92% { opacity: 0.4; transform: translate(-2px, 1px); }
-            94% { opacity: 0.2; transform: translate(2px, -1px); }
-            96% { opacity: 0.3; transform: translate(-1px, 2px); }
+            0%,90%,100% { opacity: 0; transform: translate(0,0); }
+            92% { opacity: .4; transform: translate(-2px,1px); }
+            94% { opacity: .2; transform: translate(2px,-1px); }
+            96% { opacity: .3; transform: translate(-1px,2px); }
         }
 
-        /* ===== POCKET DIMENSION VIEWER ===== */
-
-        .viewer-section {
-            padding: 40px 20px 60px;
-        }
-
+        /* ===== VIEWER ===== */
+        .viewer-section { padding: 40px 20px 60px; }
         #viewer {
-            display: none;
-            padding: 30px;
-            background: radial-gradient(circle at top,
-                rgba(0, 246, 255, 0.15),
-                #020208 60%
-            );
+            display: none; padding: 30px;
+            background: radial-gradient(circle at top, rgba(0,246,255,.15), #020208 60%);
             border-radius: 20px;
-            box-shadow:
-                0 0 40px rgba(0, 246, 255, 0.6),
-                0 0 80px rgba(255, 0, 255, 0.4);
-            position: relative;
-            overflow: hidden;
+            box-shadow: 0 0 40px rgba(0,246,255,.6), 0 0 80px rgba(255,0,255,.4);
+            position: relative; overflow: hidden;
         }
-
-        #viewer.active {
-            display: block;
-        }
-
-        /* Electric arc border */
+        #viewer.active { display: block; }
         #viewer::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            border-radius: 20px;
+            content: ""; position: absolute; inset: 0; border-radius: 20px;
             border: 2px solid transparent;
-            background:
-                linear-gradient(120deg, var(--neon-cyan), var(--neon-magenta), var(--neon-yellow))
-                border-box;
-            -webkit-mask:
-                linear-gradient(#000 0 0) padding-box,
-                linear-gradient(#000 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
-            opacity: 0.9;
-            animation: arc-flicker 2.5s infinite;
+            background: linear-gradient(120deg, var(--neon-cyan), var(--neon-magenta), var(--neon-yellow)) border-box;
+            -webkit-mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+            -webkit-mask-composite: xor; mask-composite: exclude;
+            opacity: .9; animation: arc-flicker 2.5s infinite;
         }
-
         @keyframes arc-flicker {
-            0%, 100% { opacity: 0.9; filter: blur(1px); }
-            40% { opacity: 0.5; filter: blur(2px); }
-            60% { opacity: 1; filter: blur(0.5px); }
+            0%,100% { opacity: .9; filter: blur(1px); }
+            40% { opacity: .5; filter: blur(2px); }
+            60% { opacity: 1; filter: blur(.5px); }
         }
-
-        .viewer-title {
-            margin-bottom: 10px;
-            color: var(--neon-cyan);
-            text-shadow: 0 0 10px var(--neon-cyan);
-        }
-
+        .viewer-title { margin-bottom: 10px; color: var(--neon-cyan); text-shadow: 0 0 10px var(--neon-cyan); }
         model-viewer {
-            width: 100%;
-            height: 500px;
+            width: 100%; height: 500px;
             background:
                 radial-gradient(circle at center, #111 0, #000 60%),
-                repeating-linear-gradient(
-                    to right,
-                    rgba(0, 246, 255, 0.15) 0,
-                    rgba(0, 246, 255, 0.15) 1px,
-                    transparent 1px,
-                    transparent 6px
-                );
+                repeating-linear-gradient(to right, rgba(0,246,255,.15) 0, rgba(0,246,255,.15) 1px, transparent 1px, transparent 6px);
             border-radius: 12px;
-            box-shadow:
-                0 0 30px rgba(0, 246, 255, 0.8),
-                0 0 60px rgba(255, 0, 255, 0.5);
+            box-shadow: 0 0 30px rgba(0,246,255,.8), 0 0 60px rgba(255,0,255,.5);
         }
 
         /* ===== BUTTONS ===== */
-
         .btn {
-            display: inline-block;
-            padding: 4px 8px;
-            background: var(--neon-cyan);
-            color: #000;
-            border-radius: 3px;
-            text-decoration: none;
-            font-weight: bold;
-            box-shadow: 0 0 10px var(--neon-cyan);
-            font-size: 0.7rem;
+            display: inline-block; padding: 4px 8px;
+            background: var(--neon-cyan); color: #000;
+            border-radius: 3px; text-decoration: none; font-weight: bold;
+            box-shadow: 0 0 10px var(--neon-cyan); font-size: .7rem;
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
         }
+        .btn.secondary { background: #111; color: var(--neon-cyan); box-shadow: 0 0 10px rgba(0,246,255,.6); }
+        .btn:hover { transform: translateY(-1px); }
 
-        .btn.discount {
-            background: var(--neon-magenta);
-            box-shadow: 0 0 10px var(--neon-magenta);
-        }
+        section { scroll-margin-top: 80px; }
 
-        .btn.secondary {
-            background: #111;
-            color: var(--neon-cyan);
-            box-shadow: 0 0 10px rgba(0, 246, 255, 0.6);
-        }
-
-        .btn:hover {
-            transform: translateY(-1px);
-        }
-
-        /* ===== SECTIONS FOR MINIMAP ===== */
-
-        section {
-            scroll-margin-top: 80px;
-        }
-
-        /* ===== RESPONSIVE ===== */
-
-        @media (max-width: 1400px) {
-            .gallery {
-                grid-template-columns: repeat(6, 1fr);
-            }
-        }
-
-        @media (max-width: 1000px) {
-            .gallery {
-                grid-template-columns: repeat(4, 1fr);
-            }
-        }
-
+        @media (max-width: 1400px) { .gallery { grid-template-columns: repeat(6, 1fr); } }
+        @media (max-width: 1000px) { .gallery { grid-template-columns: repeat(4, 1fr); } }
         @media (max-width: 700px) {
-            .search-row {
-                flex-direction: column;
-                padding: 0 20px;
-            }
-            #search {
-                width: 100%;
-            }
-            .gallery {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .suggestions-floating {
-                max-width: 200px;
-            }
+            .search-row { flex-direction: column; padding: 0 20px; }
+            #search { width: 100%; }
+            .gallery { grid-template-columns: repeat(2, 1fr); }
+            .suggestions-floating { max-width: 200px; }
         }
     </style>
 </head>
 
 <body>
 
-<!-- ABSTRACT CITY LAYER -->
 <div class="city-layer" aria-hidden="true">
     <div class="city-block" style="left:5%; bottom:0; width:40px; height:160px;"></div>
     <div class="city-block" style="left:12%; bottom:0; width:30px; height:120px; animation-delay:1s;"></div>
@@ -908,7 +356,7 @@
 <div id="editModal" class="modal">
     <div class="modal-content">
         <h2 class="modal-title">Edit Item</h2>
-        
+
         <div class="modal-group">
             <label class="modal-label">Item Title</label>
             <input type="text" id="editTitle" class="modal-input" placeholder="Enter title...">
@@ -919,6 +367,11 @@
             <div id="editFilesList" style="max-height: 200px; overflow-y: auto; border: 1px solid rgba(0, 246, 255, 0.2); border-radius: 4px; padding: 8px;">
                 <!-- Files will be listed here -->
             </div>
+
+            <div id="editAddDrop">
+                + Drop files here, or click to browse
+                <input type="file" id="editAddInput" multiple style="display:none;" accept=".png,.glb,.obj,.fbx,.stl">
+            </div>
         </div>
 
         <div class="modal-buttons">
@@ -928,10 +381,10 @@
     </div>
 </div>
 
-<!-- SUBTLE SUGGESTIONS BOX (TOP LEFT) -->
+<!-- SUGGESTIONS -->
 <div class="suggestions-floating" id="suggestions-floating">
     <div class="suggestions-toggle" onclick="toggleSuggestions()">
-        <div class="suggestions-label">💬 Suggestions</div>
+        <div class="suggestions-label">Suggestions</div>
         <div class="suggestions-expand" id="expand-icon">▼</div>
     </div>
     <div class="suggestions-content" id="suggestions-content">
@@ -945,7 +398,7 @@
     </div>
 </div>
 
-<!-- NEON MINIMAP NAV -->
+<!-- MINIMAP -->
 <div class="minimap-nav">
     <div class="minimap-title">NAV MAP</div>
     <div class="minimap-dots">
@@ -962,7 +415,6 @@
 
     <div class="search-row">
         <input id="search" type="text" placeholder="Search models...">
-
         <select id="category">
             <option value="all">▼ All Categories</option>
             <option value="trees">Trees</option>
@@ -975,11 +427,9 @@
 
 <section id="dropzone-section">
     <div id="dropzone" class="dropzone-container">
-        <p style="margin: 0; margin-bottom: 20px;">Drop PNG + GLB + OBJ + FBX + STL files here</p>
-        
-        <div id="dropzone-files">
-            <!-- Dropped files will appear here -->
-        </div>
+        <p style="margin: 0; margin-bottom: 20px;">Drop any combination of PNG / GLB / OBJ / FBX / STL files here — everything you drop before hitting SUBMIT lands on one card.</p>
+
+        <div id="dropzone-files"></div>
 
         <div id="dropzone-actions" class="dropzone-actions">
             <button class="submit-btn" onclick="submitDroppedFiles()">SUBMIT</button>
@@ -989,135 +439,170 @@
 </section>
 
 <section class="gallery-section" id="gallery-section">
-    <div class="gallery" id="gallery">
-
-    </div>
+    <div class="gallery" id="gallery"></div>
 </section>
 
 <section class="viewer-section" id="viewer-section">
     <div id="viewer">
         <h2 class="viewer-title" id="viewer-title">3D Viewer</h2>
         <model-viewer id="mv" auto-rotate camera-controls></model-viewer>
-
         <br>
-
         <a class="btn secondary" href="#" onclick="closeViewer()">Close</a>
     </div>
 </section>
 
 <script>
-let currentEditingIndex = -1;
-let droppedFiles = [];
+const VALID_EXTS = ['png', 'glb', 'obj', 'fbx', 'stl'];
+const MODEL_EXTS = ['glb', 'obj', 'fbx', 'stl'];
+
+let droppedFiles = [];          // files staged: [{name, ext, blob}]
+let editingItem = null;         // the .item DOM node currently open in the edit modal
+let editingFiles = [];          // working copy of files while modal is open
+const itemsById = new Map();    // id -> {id, title, category, files:[{name,ext,blob}], createdAt}
+const thumbUrls = new Map();    // id -> object URL currently used for that card's thumbnail
+let currentViewerUrl = null;    // object URL currently shown in 3D viewer (revoked on close/swap)
+
+/* ===== IndexedDB persistence =====
+   Files can easily exceed localStorage's ~5 MB cap, so we use IndexedDB.
+   One object store "items" keyed by id. Value: {id, title, category, files, createdAt}.
+*/
+const DB_NAME = 'lowdangles3d';
+const DB_VERSION = 1;
+const STORE = 'items';
+let _dbPromise = null;
+
+function openDB() {
+    if (_dbPromise) return _dbPromise;
+    _dbPromise = new Promise((resolve, reject) => {
+        const req = indexedDB.open(DB_NAME, DB_VERSION);
+        req.onupgradeneeded = e => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains(STORE)) {
+                db.createObjectStore(STORE, { keyPath: 'id' });
+            }
+        };
+        req.onsuccess = e => resolve(e.target.result);
+        req.onerror = e => { _dbPromise = null; reject(e.target.error); };
+    });
+    return _dbPromise;
+}
+
+async function idbPut(item) {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE, 'readwrite');
+        tx.objectStore(STORE).put(item);
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+    });
+}
+
+async function idbDelete(id) {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE, 'readwrite');
+        tx.objectStore(STORE).delete(id);
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+    });
+}
+
+async function idbGetAll() {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE, 'readonly');
+        const req = tx.objectStore(STORE).getAll();
+        req.onsuccess = () => resolve(req.result || []);
+        req.onerror = () => reject(req.error);
+    });
+}
+
+function newItemId() {
+    return 'it_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
+}
 
 function scrollToSection(id) {
     const el = document.getElementById(id);
     if (!el) return;
-    window.scrollTo({
-        top: el.offsetTop - 20,
-        behavior: 'smooth'
-    });
+    window.scrollTo({ top: el.offsetTop - 20, behavior: 'smooth' });
 }
 
-/* Toggle suggestions box */
 function toggleSuggestions() {
     const content = document.getElementById('suggestions-content');
     const floating = document.getElementById('suggestions-floating');
     const icon = document.getElementById('expand-icon');
-    
     content.classList.toggle('hidden');
     floating.classList.toggle('collapsed');
     icon.textContent = content.classList.contains('hidden') ? '▶' : '▼';
 }
 
-/* Open 3D Viewer */
-function openViewer(modelPath, title) {
+/* ===== 3D Viewer ===== */
+function openViewer(modelDataUrl, title) {
     const mv = document.getElementById('mv');
-    mv.setAttribute('src', modelPath);
-
-    const vt = document.getElementById('viewer-title');
-    vt.textContent = title ? title + " – 3D View" : "3D Viewer";
-
-    const viewer = document.getElementById('viewer');
-    viewer.classList.add('active');
-
+    mv.setAttribute('src', modelDataUrl);
+    document.getElementById('viewer-title').textContent = title ? title + " – 3D View" : "3D Viewer";
+    document.getElementById('viewer').classList.add('active');
     scrollToSection('viewer-section');
 }
-
-/* Close 3D Viewer */
 function closeViewer() {
     document.getElementById('viewer').classList.remove('active');
+    const mv = document.getElementById('mv');
+    mv.removeAttribute('src');
+    if (currentViewerUrl) {
+        URL.revokeObjectURL(currentViewerUrl);
+        currentViewerUrl = null;
+    }
 }
 
-/* SEARCH + CATEGORY FILTER */
+/* ===== Search / category ===== */
 document.getElementById('search').addEventListener('input', filterItems);
 document.getElementById('category').addEventListener('change', filterItems);
-
 function filterItems() {
-    let search = document.getElementById('search').value.toLowerCase();
-    let category = document.getElementById('category').value;
-    let items = document.querySelectorAll('.item');
-
-    items.forEach(item => {
-        let name = item.getAttribute('data-name').toLowerCase();
-        let cat = item.getAttribute('data-category');
-
-        let matchesSearch = name.includes(search);
-        let matchesCategory = (category === 'all' || category === cat);
-
-        if (matchesSearch && matchesCategory) {
-            item.style.display = '';
-        } else {
-            item.style.display = 'none';
-        }
+    const search = document.getElementById('search').value.toLowerCase();
+    const category = document.getElementById('category').value;
+    document.querySelectorAll('.item').forEach(item => {
+        const name = (item.getAttribute('data-name') || '').toLowerCase();
+        const cat = item.getAttribute('data-category') || 'all';
+        const matchesSearch = name.includes(search);
+        const matchesCategory = (category === 'all' || category === cat);
+        item.style.display = (matchesSearch && matchesCategory) ? '' : 'none';
     });
 }
 
-/* Drop Zone Handler */
-const dropzone = document.getElementById('dropzone');
-
-dropzone.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    dropzone.classList.add('dragover');
-});
-
-dropzone.addEventListener('dragleave', () => {
-    dropzone.classList.remove('dragover');
-});
-
-dropzone.addEventListener('drop', (e) => {
-    e.preventDefault();
-    dropzone.classList.remove('dragover');
-    
-    const files = e.dataTransfer.files;
-    addFilesToDropzone(files);
-});
-
-function addFilesToDropzone(files) {
-    const fileArray = Array.from(files);
-    
-    for (let file of fileArray) {
-        const ext = file.name.split('.').pop().toLowerCase();
-        
-        // Only accept valid extensions
-        if (['png', 'glb', 'obj', 'fbx', 'stl'].includes(ext)) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                droppedFiles.push({
-                    name: file.name,
-                    ext: ext,
-                    data: e.target.result
-                });
-                updateDropzoneDisplay();
-            };
-            reader.readAsDataURL(file);
+/* ===== Helpers ===== */
+function filesToRecords(fileList) {
+    const all = Array.from(fileList);
+    const accepted = [];
+    const rejected = [];
+    for (const f of all) {
+        const ext = f.name.split('.').pop().toLowerCase();
+        if (VALID_EXTS.includes(ext)) {
+            accepted.push({ name: f.name, ext, blob: f });
+        } else {
+            rejected.push(f);
         }
     }
+    if (rejected.length > 0) {
+        const names = rejected.map(f => f.name).join(', ');
+        alert(`Skipped ${rejected.length} unsupported file(s): ${names}\n\nAllowed: ${VALID_EXTS.join(', ')}`);
+    }
+    return accepted;
 }
+
+/* ===== Main drop zone ===== */
+const dropzone = document.getElementById('dropzone');
+dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('dragover'); });
+dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+dropzone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropzone.classList.remove('dragover');
+    droppedFiles.push(...filesToRecords(e.dataTransfer.files));
+    updateDropzoneDisplay();
+});
 
 function updateDropzoneDisplay() {
     const filesList = document.getElementById('dropzone-files');
     const actions = document.getElementById('dropzone-actions');
-
     filesList.innerHTML = '';
 
     if (droppedFiles.length === 0) {
@@ -1125,24 +610,22 @@ function updateDropzoneDisplay() {
         actions.classList.remove('active');
         return;
     }
-
     filesList.classList.add('active');
     actions.classList.add('active');
 
     droppedFiles.forEach((file, index) => {
-        const fileItem = document.createElement('div');
-        fileItem.className = 'dropzone-file-item';
-        fileItem.innerHTML = `
+        const row = document.createElement('div');
+        row.className = 'dropzone-file-item';
+        row.innerHTML = `
             <span class="file-name">${file.name}</span>
-            <button class="file-remove" onclick="removeDroppedFile(${index})">✕</button>
+            <button class="file-remove" data-idx="${index}">✕</button>
         `;
-        filesList.appendChild(fileItem);
+        row.querySelector('.file-remove').addEventListener('click', () => {
+            droppedFiles.splice(index, 1);
+            updateDropzoneDisplay();
+        });
+        filesList.appendChild(row);
     });
-}
-
-function removeDroppedFile(index) {
-    droppedFiles.splice(index, 1);
-    updateDropzoneDisplay();
 }
 
 function clearDroppedFiles() {
@@ -1150,93 +633,98 @@ function clearDroppedFiles() {
     updateDropzoneDisplay();
 }
 
-function submitDroppedFiles() {
+/* ===== SUBMIT: everything in the drop zone becomes ONE card ===== */
+async function submitDroppedFiles() {
     if (droppedFiles.length === 0) return;
 
-    // Create item data from dropped files
+    const firstModel = droppedFiles.find(f => MODEL_EXTS.includes(f.ext));
+    const titleSource = (firstModel || droppedFiles[0]).name;
+    const title = titleSource.replace(/\.[^.]+$/, '') || 'New Item';
+
     const itemData = {
-        title: 'New Item',
-        thumbnail: null,
-        models: {
-            glb: null,
-            obj: null,
-            fbx: null,
-            stl: null
-        },
-        files: droppedFiles
+        id: newItemId(),
+        title,
+        category: 'all',
+        files: droppedFiles.slice(),
+        createdAt: Date.now()
     };
 
-    // Organize files
-    for (let file of droppedFiles) {
-        if (file.ext === 'png') {
-            itemData.thumbnail = file.data;
-        } else if (['glb', 'obj', 'fbx', 'stl'].includes(file.ext)) {
-            itemData.models[file.ext] = {
-                name: file.name,
-                data: file.data
-            };
-        }
+    try {
+        await idbPut(itemData);
+    } catch (err) {
+        alert('Could not save to your browser storage:\n' + (err && err.message ? err.message : err) + '\n\nYour browser may be out of space or in private mode.');
+        return;
     }
 
-    // Create card
-    const item = createItemCard(itemData);
-    document.getElementById('gallery').appendChild(item);
+    itemsById.set(itemData.id, itemData);
+    const card = createItemCard(itemData);
+    document.getElementById('gallery').appendChild(card);
 
-    // Clear dropzone
     clearDroppedFiles();
+    filterItems();
 }
 
+/* ===== Card rendering ===== */
 function createItemCard(data) {
     const itemDiv = document.createElement('div');
     itemDiv.className = 'item';
-    itemDiv.setAttribute('data-name', data.title);
-    itemDiv.setAttribute('data-category', 'all');
-    itemDiv.setAttribute('data-files', JSON.stringify(data.files));
+    renderCardContent(itemDiv, data);
+    return itemDiv;
+}
 
-    // Add glitch overlay
+function renderCardContent(itemDiv, data) {
+    const id = data.id;
+    if (id) itemDiv.setAttribute('data-id', id);
+    itemDiv.setAttribute('data-name', data.title);
+    itemDiv.setAttribute('data-category', data.category || 'all');
+
+    // Revoke any prior thumbnail URL for this card before re-rendering
+    if (id && thumbUrls.has(id)) {
+        URL.revokeObjectURL(thumbUrls.get(id));
+        thumbUrls.delete(id);
+    }
+
+    itemDiv.innerHTML = '';
+
     const glitchDiv = document.createElement('div');
     glitchDiv.className = 'item-glitch';
     itemDiv.appendChild(glitchDiv);
 
-    // Create inner container
     const innerDiv = document.createElement('div');
     innerDiv.className = 'item-inner';
 
-    // Title
     const titleDiv = document.createElement('div');
     titleDiv.className = 'item-title';
     titleDiv.textContent = data.title;
     innerDiv.appendChild(titleDiv);
 
-    // Thumbnail
-    if (data.thumbnail) {
+    const firstPng = data.files.find(f => f.ext === 'png');
+    if (firstPng) {
+        const url = URL.createObjectURL(firstPng.blob);
+        if (id) thumbUrls.set(id, url);
         const img = document.createElement('img');
-        img.src = data.thumbnail;
+        img.src = url;
         img.alt = data.title;
         innerDiv.appendChild(img);
     }
 
-    // Model buttons
     const buttonsDiv = document.createElement('div');
     buttonsDiv.className = 'item-buttons';
-
-    for (const [format, modelData] of Object.entries(data.models)) {
-        if (modelData) {
-            const link = document.createElement('a');
-            link.href = '#';
-            link.className = 'btn';
-            link.textContent = format.toUpperCase();
-            link.onclick = (e) => {
-                e.preventDefault();
-                openViewer(modelData.data, data.title);
-            };
-            buttonsDiv.appendChild(link);
-        }
-    }
-
+    data.files.forEach((file, idx) => {
+        if (!MODEL_EXTS.includes(file.ext)) return;
+        const link = document.createElement('a');
+        link.href = '#';
+        link.className = 'btn';
+        link.title = file.name;
+        link.textContent = file.ext.toUpperCase() + ' · ' + file.name;
+        link.onclick = e => {
+            e.preventDefault();
+            openViewerForFile(id, idx);
+        };
+        buttonsDiv.appendChild(link);
+    });
     innerDiv.appendChild(buttonsDiv);
 
-    // Actions
     const actionsDiv = document.createElement('div');
     actionsDiv.className = 'item-actions';
 
@@ -1249,98 +737,132 @@ function createItemCard(data) {
     const deleteBtn = document.createElement('button');
     deleteBtn.className = 'delete-btn';
     deleteBtn.textContent = 'Delete';
-    deleteBtn.onclick = () => itemDiv.remove();
+    deleteBtn.onclick = async () => {
+        const cardId = itemDiv.getAttribute('data-id');
+        if (cardId) {
+            try { await idbDelete(cardId); }
+            catch (err) { alert('Could not delete from storage: ' + (err && err.message ? err.message : err)); return; }
+            if (thumbUrls.has(cardId)) {
+                URL.revokeObjectURL(thumbUrls.get(cardId));
+                thumbUrls.delete(cardId);
+            }
+            itemsById.delete(cardId);
+        }
+        itemDiv.remove();
+    };
     actionsDiv.appendChild(deleteBtn);
 
     innerDiv.appendChild(actionsDiv);
     itemDiv.appendChild(innerDiv);
-
-    return itemDiv;
 }
 
+function openViewerForFile(itemId, fileIndex) {
+    const item = itemsById.get(itemId);
+    if (!item) return;
+    const file = item.files[fileIndex];
+    if (!file) return;
+    if (currentViewerUrl) {
+        URL.revokeObjectURL(currentViewerUrl);
+        currentViewerUrl = null;
+    }
+    currentViewerUrl = URL.createObjectURL(file.blob);
+    openViewer(currentViewerUrl, file.name);
+}
+
+/* ===== Edit modal: add + delete files ===== */
 function openEditModal(itemElement) {
-    currentEditingIndex = Array.from(document.getElementById('gallery').children).indexOf(itemElement);
-    const title = itemElement.getAttribute('data-name');
-    const filesJSON = itemElement.getAttribute('data-files');
-    const files = JSON.parse(filesJSON || '[]');
-
-    document.getElementById('editTitle').value = title;
-
-    // Display files in edit modal
-    const filesList = document.getElementById('editFilesList');
-    filesList.innerHTML = '';
-
-    files.forEach((file, index) => {
-        const fileItem = document.createElement('div');
-        fileItem.className = 'dropzone-file-item';
-        fileItem.innerHTML = `
-            <span class="file-name">${file.name}</span>
-            <button class="file-remove" onclick="removeFileFromItem(${index})">✕</button>
-        `;
-        filesList.appendChild(fileItem);
-    });
-
+    editingItem = itemElement;
+    const id = itemElement.getAttribute('data-id');
+    const item = id ? itemsById.get(id) : null;
+    editingFiles = item ? item.files.slice() : [];
+    document.getElementById('editTitle').value = itemElement.getAttribute('data-name') || '';
+    renderEditFilesList();
     document.getElementById('editModal').classList.add('active');
 }
 
-function removeFileFromItem(fileIndex) {
-    const items = document.getElementById('gallery').children;
-    if (currentEditingIndex >= 0 && currentEditingIndex < items.length) {
-        let files = JSON.parse(items[currentEditingIndex].getAttribute('data-files') || '[]');
-        files.splice(fileIndex, 1);
-        items[currentEditingIndex].setAttribute('data-files', JSON.stringify(files));
-        
-        // Refresh modal display
-        const filesList = document.getElementById('editFilesList');
-        filesList.innerHTML = '';
-        files.forEach((file, index) => {
-            const fileItem = document.createElement('div');
-            fileItem.className = 'dropzone-file-item';
-            fileItem.innerHTML = `
-                <span class="file-name">${file.name}</span>
-                <button class="file-remove" onclick="removeFileFromItem(${index})">✕</button>
-            `;
-            filesList.appendChild(fileItem);
-        });
+function renderEditFilesList() {
+    const list = document.getElementById('editFilesList');
+    list.innerHTML = '';
+
+    if (editingFiles.length === 0) {
+        list.innerHTML = '<p style="color: var(--neon-yellow); font-size: .8rem; text-align: center; margin: 6px 0;">No files yet — add some below.</p>';
+        return;
     }
+
+    editingFiles.forEach((file, index) => {
+        const row = document.createElement('div');
+        row.className = 'dropzone-file-item';
+        row.innerHTML = `
+            <span class="file-name">${file.name}</span>
+            <button class="file-remove">✕</button>
+        `;
+        row.querySelector('.file-remove').addEventListener('click', () => {
+            editingFiles.splice(index, 1);
+            renderEditFilesList();
+        });
+        list.appendChild(row);
+    });
 }
+
+/* Add-files: drag/drop AND click-to-browse */
+const editAddDrop = document.getElementById('editAddDrop');
+const editAddInput = document.getElementById('editAddInput');
+
+editAddDrop.addEventListener('click', () => editAddInput.click());
+editAddInput.addEventListener('change', e => {
+    editingFiles.push(...filesToRecords(e.target.files));
+    renderEditFilesList();
+    editAddInput.value = '';
+});
+editAddDrop.addEventListener('dragover', e => { e.preventDefault(); editAddDrop.classList.add('dragover'); });
+editAddDrop.addEventListener('dragleave', () => editAddDrop.classList.remove('dragover'));
+editAddDrop.addEventListener('drop', e => {
+    e.preventDefault();
+    editAddDrop.classList.remove('dragover');
+    editingFiles.push(...filesToRecords(e.dataTransfer.files));
+    renderEditFilesList();
+});
 
 function closeEditModal() {
     document.getElementById('editModal').classList.remove('active');
-    currentEditingIndex = -1;
+    editingItem = null;
+    editingFiles = [];
 }
 
-function saveEditedItem() {
-    const title = document.getElementById('editTitle').value;
-    const items = document.getElementById('gallery').children;
-    if (currentEditingIndex >= 0 && currentEditingIndex < items.length) {
-        const titleElement = items[currentEditingIndex].querySelector('.item-title');
-        if (titleElement) {
-            titleElement.textContent = title;
-        }
-        items[currentEditingIndex].setAttribute('data-name', title);
+async function saveEditedItem() {
+    if (!editingItem) { closeEditModal(); return; }
+    const title = document.getElementById('editTitle').value.trim() || 'Untitled';
+    const category = editingItem.getAttribute('data-category') || 'all';
+    let id = editingItem.getAttribute('data-id');
+    if (!id) { id = newItemId(); editingItem.setAttribute('data-id', id); }
+    const prev = itemsById.get(id);
+    const createdAt = (prev && prev.createdAt) ? prev.createdAt : Date.now();
+
+    const data = { id, title, category, files: editingFiles, createdAt, updatedAt: Date.now() };
+    try {
+        await idbPut(data);
+    } catch (err) {
+        alert('Could not save changes: ' + (err && err.message ? err.message : err));
+        return;
     }
+    itemsById.set(id, data);
+    renderCardContent(editingItem, data);
     closeEditModal();
+    filterItems();
 }
 
-// Submission handler for suggestions
+/* ===== Suggestions ===== */
 document.getElementById('submit-suggestion').addEventListener('click', submitSuggestion);
-document.getElementById('suggestion-text').addEventListener('keypress', (e) => {
+document.getElementById('suggestion-text').addEventListener('keypress', e => {
     if (e.key === 'Enter') submitSuggestion();
 });
 
 function submitSuggestion() {
     const input = document.getElementById('suggestion-text');
     const text = input.value.trim();
-
     if (!text) return;
-
-    let suggestions = JSON.parse(localStorage.getItem('suggestions')) || [];
-    suggestions.push({
-        text: text,
-        timestamp: new Date().toLocaleString()
-    });
-
+    const suggestions = JSON.parse(localStorage.getItem('suggestions') || '[]');
+    suggestions.push({ text, timestamp: new Date().toLocaleString() });
     localStorage.setItem('suggestions', JSON.stringify(suggestions));
     updateSuggestionsArchive();
     input.value = '';
@@ -1348,36 +870,45 @@ function submitSuggestion() {
 
 function updateSuggestionsArchive() {
     const archive = document.getElementById('suggestions-archive');
-    const suggestions = JSON.parse(localStorage.getItem('suggestions')) || [];
-
+    const suggestions = JSON.parse(localStorage.getItem('suggestions') || '[]');
     archive.innerHTML = '';
-
     if (suggestions.length === 0) {
         archive.innerHTML = '<p style="text-align: center; color: var(--neon-yellow); font-size: 0.7rem;">No suggestions yet.</p>';
         return;
     }
-
-    suggestions.reverse().forEach(suggestion => {
+    suggestions.slice().reverse().forEach(suggestion => {
         const item = document.createElement('div');
         item.className = 'suggestion-item';
-
         const text = document.createElement('div');
         text.className = 'suggestion-text';
         text.textContent = suggestion.text;
-
         const meta = document.createElement('div');
         meta.className = 'suggestion-meta';
         meta.textContent = suggestion.timestamp;
-
         item.appendChild(text);
         item.appendChild(meta);
         archive.appendChild(item);
     });
 }
 
-// Load suggestions on page load
 window.addEventListener('load', updateSuggestionsArchive);
 
+/* ===== Rehydrate gallery from IndexedDB on page load ===== */
+async function loadGalleryFromStorage() {
+    try {
+        const items = await idbGetAll();
+        items.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+        const gallery = document.getElementById('gallery');
+        items.forEach(data => {
+            itemsById.set(data.id, data);
+            gallery.appendChild(createItemCard(data));
+        });
+        filterItems();
+    } catch (err) {
+        console.error('Failed to load saved items:', err);
+    }
+}
+window.addEventListener('load', loadGalleryFromStorage);
 </script>
 
 </body>
