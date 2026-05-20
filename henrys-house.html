@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Henry's House</title>
+<style>
+    body {
+        background: #0d0f1a;
+        color: #e0e6ff;
+        font-family: Arial, sans-serif;
+        text-align: center;
+        padding: 40px;
+    }
+
+    h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+    }
+
+    #drop-zone {
+        border: 3px dashed #4f5b93;
+        padding: 40px;
+        border-radius: 12px;
+        width: 60%;
+        margin: 30px auto;
+        background: rgba(255,255,255,0.05);
+        cursor: pointer;
+    }
+
+    #drop-zone:hover {
+        background: rgba(255,255,255,0.1);
+    }
+
+    #file-info {
+        margin-top: 15px;
+        font-size: 1rem;
+        opacity: 0.8;
+    }
+
+    #start-btn {
+        margin-top: 30px;
+        padding: 12px 24px;
+        background: #4f5b93;
+        border: none;
+        border-radius: 8px;
+        color: white;
+        font-size: 1.2rem;
+        cursor: pointer;
+    }
+
+    #start-btn:hover {
+        background: #6c78c7;
+    }
+
+    /* Modal */
+    #material-modal {
+        display: none;
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(0,0,0,0.7);
+    }
+
+    #modal-content {
+        background: #1a1d2e;
+        padding: 20px;
+        width: 400px;
+        margin: 10% auto;
+        border-radius: 10px;
+        text-align: left;
+        color: #e0e6ff;
+    }
+
+    input[type="number"], input[type="text"] {
+        width: 100%;
+        padding: 8px;
+        margin: 6px 0 12px 0;
+        border-radius: 6px;
+        border: none;
+    }
+
+    #modal-btn {
+        width: 100%;
+        padding: 10px;
+        background: #4f5b93;
+        border: none;
+        border-radius: 6px;
+        color: white;
+        cursor: pointer;
+    }
+</style>
+</head>
+
+<body>
+
+<h1>Welcome to Henry's House</h1>
+<p>Drop your OBJ or STL here. Henry will take care of the rest.</p>
+
+<div id="drop-zone">
+    <p>Drop OBJ/STL (and optional MTL) here</p>
+</div>
+
+<div id="file-info"></div>
+
+<button id="start-btn">Wake Henry</button>
+
+<!-- MATERIAL MODAL -->
+<div id="material-modal">
+    <div id="modal-content">
+        <h2>Material Parameters</h2>
+        <p>No MTL detected. Henry needs material feeler data.</p>
+
+        <label>Base Color (hex)</label>
+        <input id="color" type="text" placeholder="#ffffff">
+
+        <label>Roughness</label>
+        <input id="roughness" type="number" step="0.01" min="0" max="1" value="0.5">
+
+        <label>Metallic</label>
+        <input id="metallic" type="number" step="0.01" min="0" max="1" value="0">
+
+        <label>IOR</label>
+        <input id="ior" type="number" step="0.01" min="1" max="3" value="1.45">
+
+        <label>Alpha</label>
+        <input id="alpha" type="number" step="0.01" min="0" max="1" value="1">
+
+        <label>Subsurface</label>
+        <input id="subsurface" type="number" step="0.01" min="0" max="1" value="0">
+
+        <label>Transmission</label>
+        <input id="transmission" type="number" step="0.01" min="0" max="1" value="0">
+
+        <button id="modal-btn">Send to Henry</button>
+    </div>
+</div>
+
+<script>
+let uploadedFiles = {};
+
+document.getElementById("drop-zone").addEventListener("dragover", e => {
+    e.preventDefault();
+});
+
+document.getElementById("drop-zone").addEventListener("drop", e => {
+    e.preventDefault();
+    const files = e.dataTransfer.files;
+
+    for (let f of files) {
+        uploadedFiles[f.name.toLowerCase()] = f;
+    }
+
+    document.getElementById("file-info").innerText =
+        Object.keys(uploadedFiles).join(", ");
+});
+
+document.getElementById("start-btn").onclick = () => {
+    const hasMTL = Object.keys(uploadedFiles).some(f => f.endsWith(".mtl"));
+
+    if (!hasMTL) {
+        document.getElementById("material-modal").style.display = "block";
+    } else {
+        alert("Henry is waking up with your files!");
+    }
+};
+
+document.getElementById("modal-btn").onclick = () => {
+    const params = {
+        color: document.getElementById("color").value,
+        roughness: document.getElementById("roughness").value,
+        metallic: document.getElementById("metallic").value,
+        ior: document.getElementById("ior").value,
+        alpha: document.getElementById("alpha").value,
+        subsurface: document.getElementById("subsurface").value,
+        transmission: document.getElementById("transmission").value
+    };
+
+    console.log("Material params:", params);
+    document.getElementById("material-modal").style.display = "none";
+    alert("Henry has your material feeler data!");
+};
+</script>
+
+</body>
+</html>
