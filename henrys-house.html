@@ -5,110 +5,350 @@
 <title>Henry's House</title>
 <style>
     body {
-        background: #0d0f1a;
-        color: #e0e6ff;
-        font-family: Arial, sans-serif;
-        text-align: center;
-        padding: 40px;
+        background: #050712;
+        color: #e5e9ff;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 40px 16px;
     }
 
     h1 {
-        font-size: 2.5rem;
-        margin-bottom: 10px;
+        font-size: 2.4rem;
+        margin-bottom: 4px;
     }
 
+    p.subtitle {
+        opacity: 0.8;
+        margin-bottom: 24px;
+    }
+
+    .scene {
+        display: flex;
+        flex-direction: row;
+        gap: 40px;
+        align-items: center;
+        justify-content: center;
+        margin-top: 20px;
+        flex-wrap: wrap;
+    }
+
+    /* Drop zone / leaf area */
     #drop-zone {
-        border: 3px dashed #4f5b93;
-        padding: 40px;
-        border-radius: 12px;
-        width: 60%;
-        margin: 30px auto;
-        background: rgba(255,255,255,0.05);
+        width: 260px;
+        height: 260px;
+        border-radius: 20px;
+        border: 2px dashed #4f5b93;
+        background: radial-gradient(circle at top, #1a1f3a, #090b18);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
         cursor: pointer;
+        position: relative;
+        overflow: hidden;
     }
 
     #drop-zone:hover {
-        background: rgba(255,255,255,0.1);
+        border-color: #7b88ff;
     }
 
-    #file-info {
-        margin-top: 15px;
-        font-size: 1rem;
-        opacity: 0.8;
+    #drop-zone p {
+        margin: 6px 0;
+        text-align: center;
+        font-size: 0.95rem;
     }
 
-    #start-btn {
-        margin-top: 30px;
-        padding: 12px 24px;
-        background: #4f5b93;
-        border: none;
-        border-radius: 8px;
-        color: white;
-        font-size: 1.2rem;
+    /* Leaf representation */
+    .leaf {
+        width: 120px;
+        height: 60px;
+        background: linear-gradient(135deg, #4caf50, #8bc34a);
+        border-radius: 60px 60px 60px 60px / 40px 40px 40px 40px;
+        position: absolute;
+        bottom: 24px;
+        opacity: 0;
+        transform: scale(0.7);
+        transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    .leaf.visible {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    .leaf.eaten-25 { clip-path: inset(0 25% 0 0); }
+    .leaf.eaten-50 { clip-path: inset(0 50% 0 0); }
+    .leaf.eaten-75 { clip-path: inset(0 75% 0 0); }
+    .leaf.eaten-100 { clip-path: inset(0 100% 0 0); }
+
+    /* Henry + cocoon container */
+    .henry-container {
+        width: 260px;
+        height: 260px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Cocoon */
+    .cocoon {
+        width: 120px;
+        height: 180px;
+        background: radial-gradient(circle at 30% 10%, #f5f5f5, #c0c0c0);
+        border-radius: 60px;
+        box-shadow: 0 0 20px rgba(255,255,255,0.1);
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        cursor: default;
+    }
+
+    .cocoon.vibrating {
+        animation: cocoon-vibrate 0.6s infinite alternate;
+    }
+
+    .cocoon.ready {
+        box-shadow: 0 0 24px rgba(144,202,249,0.9);
         cursor: pointer;
     }
 
-    #start-btn:hover {
-        background: #6c78c7;
+    @keyframes cocoon-vibrate {
+        0% { transform: translateX(-2px); }
+        100% { transform: translateX(2px); }
+    }
+
+    /* Henry caterpillar */
+    .henry {
+        position: absolute;
+        bottom: 10px;
+        width: 140px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transform: translateY(20px) scale(0.9);
+        transition: opacity 0.4s ease, transform 0.4s ease;
+        pointer-events: none;
+    }
+
+    .henry.visible {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+    .henry-body {
+        width: 120px;
+        height: 40px;
+        background: radial-gradient(circle at 30% 20%, #7c4dff, #311b92);
+        border-radius: 40px;
+        position: relative;
+        box-shadow: 0 0 12px rgba(124,77,255,0.7);
+    }
+
+    .henry-eye {
+        width: 8px;
+        height: 8px;
+        background: #fff;
+        border-radius: 50%;
+        position: absolute;
+        top: 10px;
+        left: 18px;
+    }
+
+    .henry-eye::after {
+        content: "";
+        width: 4px;
+        height: 4px;
+        background: #000;
+        border-radius: 50%;
+        position: absolute;
+        top: 2px;
+        left: 2px;
+    }
+
+    /* Butterfly */
+    .butterfly {
+        position: absolute;
+        width: 80px;
+        height: 80px;
+        opacity: 0;
+        transform: translateY(20px) scale(0.8);
+        transition: opacity 0.4s ease, transform 0.4s ease;
+        pointer-events: none;
+    }
+
+    .butterfly.visible {
+        opacity: 1;
+        transform: translateY(-40px) scale(1);
+        animation: butterfly-fly 2.5s ease-out forwards;
+    }
+
+    @keyframes butterfly-fly {
+        0% { transform: translate(0, -40px) scale(1); opacity: 1; }
+        100% { transform: translate(120px, -200px) scale(0.7); opacity: 0; }
+    }
+
+    .butterfly-wing {
+        width: 40px;
+        height: 60px;
+        background: radial-gradient(circle at 30% 20%, #ff80ab, #ad1457);
+        border-radius: 40px 40px 10px 40px;
+        position: absolute;
+        top: 10px;
+        animation: wing-flap 0.6s infinite alternate;
+    }
+
+    .butterfly-wing.right {
+        right: 0;
+        transform-origin: left center;
+    }
+
+    .butterfly-wing.left {
+        left: 0;
+        transform-origin: right center;
+    }
+
+    @keyframes wing-flap {
+        0% { transform: rotate(8deg); }
+        100% { transform: rotate(-8deg); }
+    }
+
+    .butterfly-body {
+        width: 10px;
+        height: 50px;
+        background: #4a148c;
+        border-radius: 10px;
+        position: absolute;
+        left: 50%;
+        top: 18px;
+        transform: translateX(-50%);
+    }
+
+    /* Info + controls */
+    #file-info {
+        margin-top: 12px;
+        font-size: 0.9rem;
+        opacity: 0.8;
+        max-width: 480px;
+    }
+
+    #status {
+        margin-top: 16px;
+        font-size: 0.95rem;
+        opacity: 0.9;
+    }
+
+    #debug {
+        margin-top: 10px;
+        font-size: 0.8rem;
+        opacity: 0.6;
     }
 
     /* Modal */
     #material-modal {
         display: none;
         position: fixed;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
+        inset: 0;
         background: rgba(0,0,0,0.7);
+        align-items: center;
+        justify-content: center;
     }
 
     #modal-content {
-        background: #1a1d2e;
-        padding: 20px;
-        width: 400px;
-        margin: 10% auto;
+        background: #14172a;
+        padding: 20px 20px 16px;
+        width: 360px;
         border-radius: 10px;
-        text-align: left;
         color: #e0e6ff;
+        box-shadow: 0 0 20px rgba(0,0,0,0.6);
+    }
+
+    #modal-content h2 {
+        margin-top: 0;
+        margin-bottom: 8px;
+    }
+
+    #modal-content p {
+        font-size: 0.9rem;
+        opacity: 0.85;
+        margin-bottom: 12px;
     }
 
     input[type="number"], input[type="text"] {
         width: 100%;
-        padding: 8px;
-        margin: 6px 0 12px 0;
+        padding: 6px 8px;
+        margin: 4px 0 10px 0;
         border-radius: 6px;
         border: none;
+        background: #1f2338;
+        color: #e0e6ff;
+        font-size: 0.9rem;
     }
 
     #modal-btn {
         width: 100%;
-        padding: 10px;
+        padding: 8px;
         background: #4f5b93;
         border: none;
         border-radius: 6px;
         color: white;
         cursor: pointer;
+        font-size: 0.95rem;
+    }
+
+    #modal-btn:hover {
+        background: #6c78c7;
     }
 </style>
 </head>
-
 <body>
 
-<h1>Welcome to Henry's House</h1>
-<p>Drop your OBJ or STL here. Henry will take care of the rest.</p>
+<h1>Henry's House</h1>
+<p class="subtitle">Drop a model, watch Henry munch, metamorphose, and deliver your finished product.</p>
 
-<div id="drop-zone">
-    <p>Drop OBJ/STL (and optional MTL) here</p>
+<div class="scene">
+    <!-- Drop zone + leaf -->
+    <div id="drop-zone">
+        <p><strong>Drop OBJ/STL here</strong></p>
+        <p>(MTL optional)</p>
+        <div class="leaf" id="leaf"></div>
+    </div>
+
+    <!-- Henry + cocoon + butterfly -->
+    <div class="henry-container">
+        <div class="cocoon" id="cocoon">
+            <!-- Henry sleeps inside here initially -->
+        </div>
+
+        <div class="henry" id="henry">
+            <div class="henry-body">
+                <div class="henry-eye"></div>
+            </div>
+        </div>
+
+        <div class="butterfly" id="butterfly">
+            <div class="butterfly-wing left"></div>
+            <div class="butterfly-wing right"></div>
+            <div class="butterfly-body"></div>
+        </div>
+    </div>
 </div>
 
-<div id="file-info"></div>
-
-<button id="start-btn">Wake Henry</button>
+<div id="file-info">No files yet. Henry is sleeping in his cocoon.</div>
+<div id="status"></div>
+<div id="debug"></div>
 
 <!-- MATERIAL MODAL -->
 <div id="material-modal">
     <div id="modal-content">
-        <h2>Material Parameters</h2>
-        <p>No MTL detected. Henry needs material feeler data.</p>
+        <h2>Material Feelers</h2>
+        <p>No MTL detected. Henry needs some basic material info before he can munch.</p>
 
         <label>Base Color (hex)</label>
         <input id="color" type="text" placeholder="#ffffff">
@@ -131,39 +371,127 @@
         <label>Transmission</label>
         <input id="transmission" type="number" step="0.01" min="0" max="1" value="0">
 
-        <button id="modal-btn">Send to Henry</button>
+        <button id="modal-btn">Feed Henry</button>
     </div>
 </div>
 
 <script>
-let uploadedFiles = {};
+/*
+    High-level state machine for Henry:
 
-document.getElementById("drop-zone").addEventListener("dragover", e => {
+    IDLE -> FILE_DROPPED -> (MTL? yes/no)
+      -> NEED_MATERIAL (if no MTL) -> READY_TO_MUNCH
+      -> MUNCHING -> COCOON_METAMORPHOSIS -> READY_TO_DOWNLOAD
+      -> BUTTERFLY -> RESET
+*/
+
+let uploadedFiles = {};
+let henryState = "IDLE"; // IDLE, FILE_DROPPED, NEED_MATERIAL, READY_TO_MUNCH, MUNCHING, COCOON, READY_TO_DOWNLOAD, BUTTERFLY
+
+const dropZone = document.getElementById("drop-zone");
+const leaf = document.getElementById("leaf");
+const henry = document.getElementById("henry");
+const cocoon = document.getElementById("cocoon");
+const butterfly = document.getElementById("butterfly");
+const fileInfo = document.getElementById("file-info");
+const statusEl = document.getElementById("status");
+const debugEl = document.getElementById("debug");
+const modal = document.getElementById("material-modal");
+
+function setStatus(msg) {
+    statusEl.textContent = msg;
+}
+
+function setDebug(msg) {
+    debugEl.textContent = msg;
+}
+
+function updateLeafProgress(progress) {
+    // progress: 0, 0.25, 0.5, 0.75, 1
+    leaf.classList.add("visible");
+    leaf.classList.remove("eaten-25", "eaten-50", "eaten-75", "eaten-100");
+
+    if (progress >= 1) leaf.classList.add("eaten-100");
+    else if (progress >= 0.75) leaf.classList.add("eaten-75");
+    else if (progress >= 0.5) leaf.classList.add("eaten-50");
+    else if (progress >= 0.25) leaf.classList.add("eaten-25");
+}
+
+function showHenry() {
+    henry.classList.add("visible");
+}
+
+function hideHenry() {
+    henry.classList.remove("visible");
+}
+
+function startCocoonMetamorphosis() {
+    hideHenry();
+    cocoon.classList.add("vibrating");
+    henryState = "COCOON";
+    setStatus("Henry is organizing and naming your product inside the cocoon...");
+}
+
+function markReadyToDownload() {
+    cocoon.classList.remove("vibrating");
+    cocoon.classList.add("ready");
+    henryState = "READY_TO_DOWNLOAD";
+    setStatus("Henry is ready! Click the cocoon to download your final package.");
+}
+
+function triggerButterfly() {
+    cocoon.classList.remove("ready");
+    butterfly.classList.add("visible");
+    henryState = "BUTTERFLY";
+    setStatus("Henry has transformed and delivered your product.");
+    setTimeout(resetHenry, 2600);
+}
+
+function resetHenry() {
+    butterfly.classList.remove("visible");
+    leaf.classList.remove("visible", "eaten-25", "eaten-50", "eaten-75", "eaten-100");
+    uploadedFiles = {};
+    fileInfo.textContent = "No files yet. Henry is sleeping in his cocoon.";
+    setStatus("");
+    setDebug("");
+    henryState = "IDLE";
+}
+
+dropZone.addEventListener("dragover", e => {
     e.preventDefault();
 });
 
-document.getElementById("drop-zone").addEventListener("drop", e => {
+dropZone.addEventListener("drop", e => {
     e.preventDefault();
     const files = e.dataTransfer.files;
+    uploadedFiles = {};
 
     for (let f of files) {
         uploadedFiles[f.name.toLowerCase()] = f;
     }
 
-    document.getElementById("file-info").innerText =
-        Object.keys(uploadedFiles).join(", ");
+    const names = Object.keys(uploadedFiles);
+    fileInfo.textContent = "Files: " + names.join(", ");
+    henryState = "FILE_DROPPED";
+    setStatus("Henry smells a fresh leaf…");
+
+    // Show leaf full
+    updateLeafProgress(0);
+    leaf.classList.add("visible");
+
+    // Check for MTL
+    const hasMTL = names.some(n => n.endsWith(".mtl"));
+    if (!hasMTL) {
+        henryState = "NEED_MATERIAL";
+        modal.style.display = "flex";
+    } else {
+        henryState = "READY_TO_MUNCH";
+        setStatus("Henry is ready to munch. Processing will start when wired to backend.");
+        simulateMunching();
+    }
 });
 
-document.getElementById("start-btn").onclick = () => {
-    const hasMTL = Object.keys(uploadedFiles).some(f => f.endsWith(".mtl"));
-
-    if (!hasMTL) {
-        document.getElementById("material-modal").style.display = "block";
-    } else {
-        alert("Henry is waking up with your files!");
-    }
-};
-
+// Modal confirm
 document.getElementById("modal-btn").onclick = () => {
     const params = {
         color: document.getElementById("color").value,
@@ -174,11 +502,52 @@ document.getElementById("modal-btn").onclick = () => {
         subsurface: document.getElementById("subsurface").value,
         transmission: document.getElementById("transmission").value
     };
-
-    console.log("Material params:", params);
-    document.getElementById("material-modal").style.display = "none";
-    alert("Henry has your material feeler data!");
+    setDebug("Material params: " + JSON.stringify(params));
+    modal.style.display = "none";
+    henryState = "READY_TO_MUNCH";
+    setStatus("Henry is ready to munch. Processing will start when wired to backend.");
+    simulateMunching();
 };
+
+// Click cocoon to download when ready
+cocoon.addEventListener("click", () => {
+    if (henryState === "READY_TO_DOWNLOAD") {
+        // Here you will trigger actual download from backend
+        setDebug("Download triggered (placeholder).");
+        triggerButterfly();
+    }
+});
+
+/*
+    For now, simulate munching + metamorphosis with timeouts.
+    Later, this will be driven by WebSocket messages from the backend.
+*/
+function simulateMunching() {
+    if (henryState !== "READY_TO_MUNCH") return;
+    henryState = "MUNCHING";
+    showHenry();
+    setStatus("Henry is munching the leaf…");
+
+    const steps = [0.25, 0.5, 0.75, 1];
+    let i = 0;
+
+    function nextBite() {
+        if (i >= steps.length) {
+            // Leaf fully eaten
+            startCocoonMetamorphosis();
+            // Simulate cocoon work
+            setTimeout(() => {
+                markReadyToDownload();
+            }, 2000);
+            return;
+        }
+        updateLeafProgress(steps[i]);
+        i++;
+        setTimeout(nextBite, 700);
+    }
+
+    nextBite();
+}
 </script>
 
 </body>
